@@ -25,17 +25,20 @@ project "Kakali"
 				  "%{wks.location}/vendor/dependencies/glfw/include",
 				  "%{wks.location}/vendor/dependencies/stb",
 				  "%{wks.location}/vendor/dependencies/imgui",
-				  "%{wks.location}/vendor/dependencies/glm" }
+				  "%{wks.location}/vendor/dependencies/glm",
+				  "%{wks.location}/vendor/dependencies/assimp/include" }
 
 	libdirs { "%{wks.location}/vendor/dependencies/libs/GLFW",
 			  "%{wks.location}/vendor/dependencies/libs/STB",
-			  "%{wks.location}/vendor/dependencies/libs/ImGui" }
+			  "%{wks.location}/vendor/dependencies/libs/ImGui",
+			  "%{wks.location}/vendor/dependencies/assimp/Debug" }
 
 	links {
 		"GLAD",
 		"GLFW",
 		"STB",
 		"ImGui",
+		"assimp-vc143-mtd.lib"
 		 }
 
 	configurations {
