@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "events/KeyEvent.h"
+
 bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
 {
     p_window = new Window();
@@ -9,6 +11,7 @@ bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bo
         std::cout << "Couldn't initialize window..." << std::endl;
         return false;
     }
+    p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     return true;
 }
 
@@ -38,6 +41,11 @@ void Application::Run()
 
 void Application::OnEvent(Event& event)
 {
+    if (event.GetEventType() == EventType::KeyPressed) {
+        if (((KeyPressedEvent&)event).GetKeyCode() == GLFW_KEY_F11) {
+            p_window->SetFullscreen(!p_window->IsFullscreen());
+        }
+    }
 }
 
 void Application::OnUpdate(double timestep)

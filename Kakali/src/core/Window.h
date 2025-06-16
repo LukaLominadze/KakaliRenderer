@@ -8,6 +8,7 @@
 struct WindowData {
 	const char* Title;
 	uint32_t Width, Height;
+	uint32_t WindowedWidth, WindowedHeight;
 	bool Fullscreen, VSync;
 	bool ShouldClose;
 
@@ -30,10 +31,10 @@ public:
 	void PollEvents();
 	void Update();
 
-	inline void SetVSync(bool value);
+	void SetVSync(bool value);
 	inline const bool IsVSync() const { return m_windowData.VSync; }
 
-	inline void SetFullscreen(bool value);
+	void SetFullscreen(bool value);
 	inline const bool IsFullscreen() const { return m_windowData.Fullscreen; }
 
 	inline const bool ShouldClose() const { return m_windowData.ShouldClose; }
@@ -41,12 +42,12 @@ public:
 	inline WindowData& GetWindowData() { return m_windowData; }
 public:
 	static void SetGlobalVSync(bool value);
-	static bool IsGlobalVSync();
+	inline static bool IsGlobalVSync() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync; }
 
 	static void SetGlobalFullscreen(bool value);
-	static bool IsGlobalFullscreen();
+	inline static bool IsGlobalFullscreen() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).Fullscreen; }
 
-	static WindowData& GetGlobalWindowData();
+	inline static WindowData& GetGlobalWindowData() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())); }
 private:
 	bool StartGLFW();
 	bool CreateWindow();
@@ -54,8 +55,8 @@ private:
 	bool StartGLAD();
 	void CreateCallbacks();
 private:
-	GLFWwindow* p_window;
-	GLFWmonitor* p_monitor;
+	GLFWwindow* p_window = nullptr;
+	GLFWmonitor* p_monitor = nullptr;
 
 	WindowData m_windowData;
 };

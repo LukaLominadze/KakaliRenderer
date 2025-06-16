@@ -1,11 +1,17 @@
 #include "Window.h"
 
+#include "events/Event.h"
+#include "events/ApplicationEvent.h"
+#include "events/KeyEvent.h"
+#include "events/MouseEvent.h"
+
 #include <iostream>
 
 bool Window::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
 {
 	m_windowData = {
 		title,
+		width, height,
 		width, height,
 		fullscreen, vsync
 	};
@@ -31,7 +37,8 @@ bool Window::StartUp(const char* title, uint32_t width, uint32_t height, bool fu
 
 void Window::ShutDown()
 {
-	// TODO:
+	glfwDestroyWindow(p_window);
+	glfwTerminate();
 }
 
 void Window::PollEvents()
@@ -44,7 +51,7 @@ void Window::Update()
 	glfwSwapBuffers(p_window);
 }
 
-inline void Window::SetVSync(bool value)
+void Window::SetVSync(bool value)
 {
 	m_windowData.VSync = value;
 	if (value)
@@ -53,7 +60,7 @@ inline void Window::SetVSync(bool value)
 		glfwSwapInterval(0);
 }
 
-inline void Window::SetFullscreen(bool value)
+void Window::SetFullscreen(bool value)
 {
 	m_windowData.Fullscreen = value;
 	const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
@@ -63,23 +70,17 @@ inline void Window::SetFullscreen(bool value)
 	else {
 		int xpos = (mode->width / m_windowData.Width) / 2;
 		int ypos = (mode->height / m_windowData.Height) / 2 + 40;
-		glfwSetWindowMonitor(p_window, NULL, xpos, ypos, m_windowData.Width, m_windowData.Height, 0);
+		glfwSetWindowMonitor(p_window, NULL, xpos, ypos, m_windowData.WindowedWidth, m_windowData.WindowedHeight, 0);
 	}
 }
 
 void Window::SetGlobalVSync(bool value)
 {
-
 	(*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync = value;
 	if (value)
 		glfwSwapInterval(1);
 	else
 		glfwSwapInterval(0);
-}
-
-bool Window::IsGlobalVSync()
-{
-	return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync;
 }
 
 void Window::SetGlobalFullscreen(bool value)
@@ -95,18 +96,8 @@ void Window::SetGlobalFullscreen(bool value)
 	else {
 		int xpos = (mode->width / windowData.Width) / 2;
 		int ypos = (mode->height / windowData.Height) / 2 + 40;
-		glfwSetWindowMonitor(window, NULL, xpos, ypos, windowData.Width, windowData.Height, 0);
+		glfwSetWindowMonitor(window, NULL, xpos, ypos, windowData.WindowedWidth, windowData.WindowedHeight, 0);
 	}
-}
-
-bool Window::IsGlobalFullscreen()
-{
-	return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).Fullscreen;
-}
-
-WindowData& Window::GetGlobalWindowData()
-{
-	return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext()));
 }
 
 bool Window::StartGLFW()
@@ -155,5 +146,75 @@ void Window::CreateCallbacks()
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.ShouldClose = true;
+		});
+
+	glfwSetWindowSizeCallback(p_window, [](GLFWwindow* window, int width, int height)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.Width = width;
+			data.Height = height;
+			if (!data.Fullscreen) {
+				data.WindowedWidth = width;
+				data.WindowedHeight = height;
+			}
+			glViewport(0, 0, data.Width, data.Height);
+			WindowResizedEvent event(width, height);
+			data.EventCallback(event);
+		});
+
+	glfwSetKeyCallback(p_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			switch (action)
+			{
+			case GLFW_PRESS:
+			{
+				KeyPressedEvent event(key);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				KeyReleasedEvent event(key);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_REPEAT:
+			{
+				KeyPressedEvent event(key);
+				data.EventCallback(event);
+				break;
+			}
+			}
+		});
+
+	glfwSetMouseButtonCallback(p_window, [](GLFWwindow* window, int button, int action, int mods)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			switch (action)
+			{
+			case GLFW_PRESS:
+			{
+				MouseButtonPressedEvent event(button);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				MouseButtonReleasedEvent event(button);
+				data.EventCallback(event);
+				break;
+			}
+			}
+		});
+
+	glfwSetScrollCallback(p_window, [](GLFWwindow* window, double xOffset, double yOffset)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			MouseScrolledEvent event((float)xOffset, (float)yOffset);
+			data.EventCallback(event);
 		});
 }
