@@ -14,6 +14,11 @@ public:
 	bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
 	void ShutDown();
 
+	void PushLayer(Layer* layer);
+	void PushOverlay(Layer* layer);
+	void PopLayer(Layer* layer);
+	void PopOverlay(Layer* layer);
+
 	void Run();
 private:
 	void OnEvent(Event& event);

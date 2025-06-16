@@ -36,13 +36,17 @@ void VertexArray::AddIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
 void VertexArray::Bind() const
 {
 	GLCall(glBindVertexArray(m_rendererID));
-	r_ibo->Bind();
+	if (r_ibo.get()) {
+		r_ibo->Bind();
+	}
 }
 
 void VertexArray::Unbind() const
 {
 	GLCall(glBindVertexArray(0));
-	r_ibo->Unbind();
+	if (r_ibo.get()) {		
+		r_ibo->Unbind();
+	}
 }
 
 void VertexArray::SetVertexBufferData(const void* data, uint32_t size)

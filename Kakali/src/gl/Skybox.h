@@ -8,8 +8,11 @@
 class Skybox
 {
 public:
-	Skybox(const std::string& filePath);
-	~Skybox();
+	Skybox() = default;
+	~Skybox() = default;
+
+	void GenTexture(const std::string& filePath);
+	void Delete();
 
 	void Bind() const;
 	void Unbind() const;

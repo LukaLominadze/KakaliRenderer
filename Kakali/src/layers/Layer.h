@@ -11,7 +11,7 @@ public:
 	virtual ~Layer() = default;
 
 	virtual void OnAttach() {}
-	virtual void OnEvent(Event& evnet) {}
+	virtual void OnEvent(Event& event) {}
 	virtual void OnUpdate(float timestep) {}
 	virtual void OnRender() {}
 	virtual void OnImGuiRender() {}

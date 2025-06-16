@@ -4,15 +4,15 @@
 #include <stb_image.h>
 #include "pch.h"
 
-Skybox::Skybox(const std::string& filePath)
+void Skybox::GenTexture(const std::string& filePath)
 {
 	std::array<std::string, 6> faces = {
-		"right.jpg", 
-		"left.jpg",  
-		"top.jpg",   
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
 		"bottom.jpg",
-		"front.jpg", 
-		"back.jpg"   
+		"front.jpg",
+		"back.jpg"
 	};
 
 	GLCall(glGenTextures(1, &m_rendererID));
@@ -44,12 +44,9 @@ Skybox::Skybox(const std::string& filePath)
 	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 }
 
-Skybox::~Skybox()
+void Skybox::Delete()
 {
-	if (m_rendererID != -1) {
-		GLCall(glDeleteTextures(1, &m_rendererID));
-		m_rendererID = -1;
-	}
+	GLCall(glDeleteTextures(1, &m_rendererID));
 }
 
 void Skybox::Bind() const
