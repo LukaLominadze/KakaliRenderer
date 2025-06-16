@@ -38,13 +38,18 @@ project "Kakali"
 		"GLFW",
 		"STB",
 		"ImGui",
-		"assimp-vc143-mtd.lib"
+		"assimp-vc143-mtd.lib",
+		"unit.lib"
 		 }
 
 	configurations {
 		"Debug",
 		"Release",
 		"Distribution"
+	}
+
+	postbuildcommands {
+		"{COPYDIR} %{wks.location}/vendor/dependencies/assimp/assimp-vc143-mtd.dll %{wks.location}/bin/" ..outputdir.. "/%{prj.name}"
 	}
 
 	filter "system:windows"

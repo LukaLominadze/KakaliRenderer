@@ -2,15 +2,15 @@
 
 #include "pch.h"
 
-VertexArray::VertexArray()
+void VertexArray::GenBuffer()
 {
 	GLCall(glGenVertexArrays(1, &m_rendererID));
 	GLCall(glBindVertexArray(m_rendererID));
 }
 
-VertexArray::~VertexArray()
+void VertexArray::Delete()
 {
-	Delete();
+	GLCall(glDeleteVertexArrays(1, &m_rendererID));
 }
 
 void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout)
@@ -55,12 +55,4 @@ void VertexArray::SetIndexBufferData(const void* data, uint32_t count)
 {
 	r_ibo.get()->Bind();
 	r_ibo.get()->SetData(data, count);
-}
-
-void VertexArray::Delete()
-{
-	if (m_rendererID == -1) {
-		GLCall(glDeleteVertexArrays(1, &m_rendererID));
-		m_rendererID = -1;
-	}
 }

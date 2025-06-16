@@ -14,18 +14,18 @@
 class Shader
 {
 public:
-    // the program ID
-    unsigned int ID;
-
-    // constructor reads and builds the shader
     Shader(const char* vertexPath, const char* fragmentPath);
-    // use/activate the shader
-    void use();
-    // utility uniform functions
-    void setBool(const std::string& name, bool value) const;
-    void setInt(const std::string& name, int value) const;
-    void setFloat(const std::string& name, float value) const;
-    void setFloat3(const std::string& name, float v0, float v1, float v2) const;
-    void setIntV(const std::string& name, unsigned int count, int* value);
-    void setMat4f(const std::string& name, const glm::mat4& matrix);
+
+    void Use();
+
+    void SetBool(const std::string& name, bool value) const;
+    void SetInt(const std::string& name, int value) const;
+    void SetFloat(const std::string& name, float value) const;
+    void SetFloat3(const std::string& name, float v0, float v1, float v2) const;
+    void SetIntV(const std::string& name, unsigned int count, int* value);
+    void SetMat4f(const std::string& name, const glm::mat4& matrix);
+
+    inline const uint32_t GetRendererID() const { return m_rendererID; }
+private:
+    uint32_t m_rendererID;
 };

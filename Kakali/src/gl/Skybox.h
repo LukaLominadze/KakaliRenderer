@@ -14,7 +14,7 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	inline const uint32_t GetID() const { return m_rendererID; }
+	inline const uint32_t GetRendererID() const { return m_rendererID; }
 private:
 	uint32_t m_rendererID;
 };

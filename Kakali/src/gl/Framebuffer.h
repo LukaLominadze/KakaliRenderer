@@ -17,8 +17,11 @@ struct FrameBufferSpecification {
 class FrameBuffer
 {
 public:
-	FrameBuffer(const FrameBufferSpecification& props);
-	~FrameBuffer();
+	FrameBuffer();
+	~FrameBuffer() = default;
+
+	void GenBuffer(const FrameBufferSpecification& props);
+	void Delete();
 
 	void Resize(uint32_t width, uint32_t height);
 	void Invalidate();
@@ -28,6 +31,8 @@ public:
 
 	inline uint32_t GetColorAttachment() const { return m_colorAttachment; }
 	inline uint32_t GetDepthAttachment() const { return m_depthAttachment; }
+
+	inline const uint32_t GetRendererID() const { return m_rendererID; }
 private:
 	uint32_t m_rendererID, m_colorAttachment, m_depthAttachment;
 	FrameBufferSpecification m_spec;

@@ -1,8 +1,12 @@
 #include "Framebuffer.h"
 #include <iostream>
 
-FrameBuffer::FrameBuffer(const FrameBufferSpecification& props)
-	:m_spec(props), m_rendererID(0), m_colorAttachment(0), m_depthAttachment(0)
+FrameBuffer::FrameBuffer()
+	:m_rendererID(0), m_colorAttachment(0), m_depthAttachment(0)
+{
+}
+
+void FrameBuffer::GenBuffer(const FrameBufferSpecification& props)
 {
 	glCreateFramebuffers(1, &m_rendererID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID);
@@ -44,13 +48,15 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& props)
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
-FrameBuffer::~FrameBuffer()
+void FrameBuffer::Delete()
 {
-	glDeleteTextures(1, &m_depthAttachment);
-	glDeleteTextures(1, &m_colorAttachment);
+	if ((m_spec.Attachments & FrameBufferAttachments::COLOR) == FrameBufferAttachments::COLOR)
+		glDeleteTextures(1, &m_colorAttachment);
+	if ((m_spec.Attachments & FrameBufferAttachments::DEPTH) == FrameBufferAttachments::DEPTH ||
+		(m_spec.Attachments & FrameBufferAttachments::DEPTH_STENCIL) == FrameBufferAttachments::DEPTH_STENCIL)
+		glDeleteTextures(1, &m_depthAttachment);
 	glDeleteFramebuffers(1, &m_rendererID);
 }
 
@@ -65,8 +71,11 @@ void FrameBuffer::Resize(uint32_t width, uint32_t height)
 void FrameBuffer::Invalidate()
 {
 	if (m_rendererID) {
-		glDeleteTextures(1, &m_depthAttachment);
-		glDeleteTextures(1, &m_colorAttachment);
+		if ((m_spec.Attachments & FrameBufferAttachments::COLOR) == FrameBufferAttachments::COLOR)
+			glDeleteTextures(1, &m_colorAttachment);
+		if ((m_spec.Attachments & FrameBufferAttachments::DEPTH) == FrameBufferAttachments::DEPTH ||
+			(m_spec.Attachments & FrameBufferAttachments::DEPTH_STENCIL) == FrameBufferAttachments::DEPTH_STENCIL)
+			glDeleteTextures(1, &m_depthAttachment);
 		glDeleteFramebuffers(1, &m_rendererID);
 	}
 
