@@ -1,0 +1,17 @@
+**.vs/
+
+/build
+/releases/
+**/bin
+/bin-int
+**/obj
+
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+**.sln
+
+**.ini
+
+*.log
