@@ -12,6 +12,13 @@ bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bo
         return false;
     }
     p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+
+    if (!m_layerStack.StartUp()) {
+        std::cout << "Couldn't initialize layer stack..." << std::endl;
+        return false;
+    }
+    m_layerStack.PushOverlay(&m_imGuiLayer);
+
     return true;
 }
 

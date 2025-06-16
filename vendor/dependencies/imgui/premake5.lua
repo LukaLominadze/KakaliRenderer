@@ -31,6 +31,11 @@ project "ImGui"
 		systemversion "latest"
 		cppdialect "C++17"
 		staticruntime "On"
+	
+	filter "system:linux"
+	    systemversion "latest"
+	    cppdialect "C++17"
+	    staticruntime "On"
 
 	filter "configurations:Debug"
 		runtime "Debug"

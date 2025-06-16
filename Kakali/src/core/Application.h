@@ -2,6 +2,9 @@
 
 #include "Window.h"
 
+#include "layers/LayerStack.h"
+#include "layers/ImGuiLayer.h"
+
 class Application
 {
 public:
@@ -19,5 +22,8 @@ private:
 	void OnImGuiRender();
 private:
 	Window* p_window;
+
+	LayerStack m_layerStack;
+	ImGuiLayer m_imGuiLayer;
 };
 
