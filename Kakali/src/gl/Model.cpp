@@ -55,17 +55,11 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
         vertex.Position = vector;
-
-        vector.x = 1.0f;
-        vector.y = 1.0f;
-        vector.z = 1.0f;
-        vertex.Colors = glm::vec4(vector, 1.0f);
         
         vector.x = mesh->mNormals[i].x;
         vector.y = mesh->mNormals[i].y;
         vector.z = mesh->mNormals[i].z;
         vertex.Normals = vector;
-
 
         if (mesh->HasTextureCoords(0)) {
             glm::vec2 vec;

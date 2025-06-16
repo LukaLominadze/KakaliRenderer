@@ -9,7 +9,6 @@
 
 struct Vertex {
 	glm::vec3 Position;
-    glm::vec4 Colors;
 	glm::vec2 TexCoords;
 	glm::vec3 Normals;
 };
@@ -27,6 +26,7 @@ public:
     std::vector<unsigned int> indices;
     std::vector<TextureData>      textures;
 
+    Mesh() = default;
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureData> textures);
     void Draw(Shader& shader);
 private:

@@ -9,6 +9,7 @@
 #include "gl/VertexBufferLayout.h"
 #include "gl/Skybox.h"
 #include "gl/Model.h"
+#include "gl/Texture.h"
 
 class SandboxLayer : public Layer
 {
@@ -23,10 +24,21 @@ public:
 	void OnDetach() override;
 private:
 	PerspectiveCameraController m_camera;
-	Shader m_skyboxShader, m_basicShader;
+	Shader m_skyboxShader, m_lightingShader;
 	VertexArray m_vao;
 	Skybox m_skybox;
 	std::shared_ptr<VertexBuffer> p_vbo;
-	Model backpack;
+	Model m_backpack;
+	Mesh m_floor;
+	Texture m_floorTexture;
+
+	glm::vec3 globalAmbient = glm::vec3(1.0f);
+	float globalIntensity = 1.0f;
+
+	glm::vec3 dirAmbient = glm::vec3(1.0f);
+	glm::vec3 dirDiffuse = glm::vec3(1.0f);
+	glm::vec3 dirSpecular = glm::vec3(1.0f);
+	glm::vec3 dirDirection = glm::vec3(0.0f);
+	float dirIntensity = 1.0f;
 };
 
