@@ -4,6 +4,7 @@
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
+#include "core/Log.h"
 
 #include <iostream>
 
@@ -137,7 +138,15 @@ bool Window::SetupMonitor()
 
 bool Window::StartGLAD()
 {
-	return gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		return false;
+	}
+
+	GLCall(glEnable(GL_DEPTH_TEST));
+	GLCall(glDepthFunc(GL_LESS));
+	GLCall(glDepthMask(GL_TRUE));
+
+	return true;
 }
 
 void Window::CreateCallbacks()

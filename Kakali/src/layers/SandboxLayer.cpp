@@ -53,6 +53,7 @@ void SandboxLayer::OnAttach()
     };
 
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
+    m_basicShader.LoadShader("src/res/shaders/basic.vert", "src/res/shaders/basic.frag");
 
     p_vbo = std::make_shared<VertexBuffer>();
 
@@ -67,6 +68,8 @@ void SandboxLayer::OnAttach()
 
     m_skybox.GenTexture("src/res/skyboxes/ocean");
     m_skybox.Unbind();
+
+    backpack = Model("src/res/objects/backpack/backpack.obj");
 }
 
 void SandboxLayer::OnEvent(Event& event)
@@ -90,6 +93,12 @@ void SandboxLayer::OnRender()
     m_skyboxShader.SetInt("skybox", 0);
     m_vao.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_basicShader.Use();
+    m_basicShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix());
+    backpack.Draw(m_basicShader);
 }
 
 void SandboxLayer::OnImGuiRender()

@@ -9,6 +9,7 @@
 class Model
 {
 public:
+    Model() = default;
     Model(const char* path)
     {
         loadModel(path);
