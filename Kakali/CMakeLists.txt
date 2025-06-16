@@ -24,7 +24,10 @@ target_include_directories(Kakali PRIVATE
     ${CMAKE_SOURCE_DIR}/vendor/dependencies/stb
     ${CMAKE_SOURCE_DIR}/vendor/dependencies/imgui
     ${CMAKE_SOURCE_DIR}/vendor/dependencies/glm
+    ${CMAKE_SOURCE_DIR}/vendor/dependencies/assimp/include
 )
+
+message(STATUS "Assimp lib path: ${CMAKE_SOURCE_DIR}/vendor/dependencies/assimp/Debug/assimp-vc143-mtd.lib")
 
 # Link dependencies
 target_link_libraries(Kakali PRIVATE
@@ -32,6 +35,8 @@ target_link_libraries(Kakali PRIVATE
     glfw
     stb
     imgui
+    ${CMAKE_SOURCE_DIR}/vendor/dependencies/assimp/Debug/assimp-vc143-mtd.lib
+    ${CMAKE_SOURCE_DIR}/vendor/dependencies/assimp/Debug/unit.lib
 )
 
 # Define preprocessor macros
@@ -59,3 +64,18 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Distribution")
     target_compile_definitions(Kakali PRIVATE DISTRIBUTION)
     set_property(TARGET Kakali PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 endif()
+
+# Post build: copy assimp dll
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_SOURCE_DIR}/vendor/dependencies/assimp/assimp-vc143-mtd.dll
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Kakali/src/res/
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Kakali/src/res/
+    ${CMAKE_CURRENT_BINARY_DIR}/src/res
+)
