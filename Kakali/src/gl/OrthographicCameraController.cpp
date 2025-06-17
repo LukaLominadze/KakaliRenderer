@@ -14,6 +14,7 @@ OrthographicCameraController::~OrthographicCameraController()
 
 void OrthographicCameraController::SetProjection(float aspectRatio, bool rotation)
 {
+	m_aspectRatio = aspectRatio;
 	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
 }
 
@@ -22,6 +23,8 @@ void OrthographicCameraController::OnEvent(Event& event)
 	EventDispatcher dispatcher = EventDispatcher(event);
 	dispatcher.Dispatch<MouseScrolledEvent>(std::bind(&OrthographicCameraController::OnMouseScrolled, this, std::placeholders::_1));
 	dispatcher.Dispatch<WindowResizedEvent>(std::bind(&OrthographicCameraController::OnWindowResized, this, std::placeholders::_1));
+	dispatcher.Dispatch<MouseButtonPressedEvent>(std::bind(&OrthographicCameraController::OnMouseButtonPressed, this, std::placeholders::_1));
+	dispatcher.Dispatch<KeyPressedEvent>(std::bind(&OrthographicCameraController::OnEscPressed, this, std::placeholders::_1));
 }
 
 void OrthographicCameraController::OnUpdate(float timestep)
@@ -38,25 +41,33 @@ void OrthographicCameraController::OnUpdate(float timestep)
 		cos(pitch) * cos(yaw)
 	));
 	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f))); // world up
+	glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
 	if (Input::IsKeyPressed(GLFW_KEY_W))
-		cameraPosition += forward * m_cameraTranslationSpeed * timestep;
+		cameraPosition.y += m_cameraTranslationSpeed * timestep;
 	if (Input::IsKeyPressed(GLFW_KEY_S))
-		cameraPosition -= forward * m_cameraTranslationSpeed * timestep;
+		cameraPosition.y -= m_cameraTranslationSpeed * timestep;
 	if (Input::IsKeyPressed(GLFW_KEY_A))
 		cameraPosition -= right * m_cameraTranslationSpeed * timestep;
 	if (Input::IsKeyPressed(GLFW_KEY_D))
 		cameraPosition += right * m_cameraTranslationSpeed * timestep;
 
-	if (Input::IsKeyPressed(GLFW_KEY_Q))
-		cameraRotation.y += m_cameraRotationSpeed * timestep;
-	if (Input::IsKeyPressed(GLFW_KEY_E))
-		cameraRotation.y -= m_cameraRotationSpeed * timestep;
+	std::pair<float, float> delta = Input::GetMousePositionDelta();
 
-	if (Input::IsKeyPressed(GLFW_KEY_R))
-		cameraRotation.x += m_cameraRotationSpeed * timestep;
-	if (Input::IsKeyPressed(GLFW_KEY_F))
-		cameraRotation.x -= m_cameraRotationSpeed * timestep;
+	if (m_mouseLocked) {
+		float sensitivity = m_cameraRotationSpeed * timestep;
+		m_camera.SetPosition(cameraPosition);
+
+		cameraRotation.y += delta.first * sensitivity;
+		cameraRotation.x += delta.second * sensitivity;
+
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		m_camera.SetRotation(glm::vec3(pitch, yaw, 0.0f));
+	}
 
 	m_camera.SetPosition(cameraPosition);
 	m_camera.SetRotation(cameraRotation);
@@ -84,4 +95,21 @@ bool OrthographicCameraController::OnWindowResized(WindowResizedEvent& e)
 	return false;
 }
 
+bool OrthographicCameraController::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+{
+	if (e.GetButton() == GLFW_MOUSE_BUTTON_1) {
+		glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		m_mouseLocked = true;
+	}
+	return false;
+}
+
+bool OrthographicCameraController::OnEscPressed(KeyPressedEvent& e)
+{
+	if (e.GetKeyCode() == GLFW_KEY_ESCAPE) {
+		glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		m_mouseLocked = false;
+	}
+	return false;
+}
 

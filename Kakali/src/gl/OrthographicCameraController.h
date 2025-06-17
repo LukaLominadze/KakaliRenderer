@@ -21,12 +21,15 @@ public:
 private:
 	bool OnMouseScrolled(MouseScrolledEvent& e);
 	bool OnWindowResized(WindowResizedEvent& e);
+	bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+	bool OnEscPressed(KeyPressedEvent& e);
 private:
 	float m_aspectRatio;
 	float m_zoom = 1.0f;
 	OrthographicCamera m_camera;
 
 	bool m_rotation = false;
+	bool m_mouseLocked = false;
 
 	float m_cameraTranslationSpeed = 3.0f, m_cameraRotationSpeed = 180.0f;
 };

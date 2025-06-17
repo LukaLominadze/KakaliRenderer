@@ -50,7 +50,7 @@ void SandboxLayer::OnAttach()
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
     m_lightingShader.LoadShader("src/res/shaders/lighting.vert", "src/res/shaders/lighting.frag");
 
-    m_camera.SetProjection(16.0f / 9.0f, 60.0f);
+    m_camera.SetProjection((16.0f / 9.0f), true);
 
     p_vbo = std::make_shared<VertexBuffer>();
 
