@@ -45,7 +45,8 @@ else
     read -p "Do you want to download and install CMake? (y/n) " choice
     if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
         echo "Opening CMake download page..."
-        cmd.exe /c start https://cmake.org/download/
+        echo "https://cmake.org/download/"
+        python vendor/installations/cmake_install.py
     else
         echo "Installation canceled."
     fi
