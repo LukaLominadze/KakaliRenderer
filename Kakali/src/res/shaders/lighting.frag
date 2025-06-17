@@ -40,7 +40,7 @@ vec3 directional_light()
     vec3 ambient  = directionalLight.ambient  * vec3(texture(texture_diffuse0, oTexCoord));
     vec3 diffuse  = directionalLight.diffuse  * diff * vec3(texture(texture_diffuse0, oTexCoord));
     vec3 specular = directionalLight.specular * spec * vec3(texture(texture_specular0, oTexCoord));
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * directionalLight.intensity;
 }
 
 

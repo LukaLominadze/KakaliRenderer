@@ -50,7 +50,7 @@ void SandboxLayer::OnAttach()
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
     m_lightingShader.LoadShader("src/res/shaders/lighting.vert", "src/res/shaders/lighting.frag");
 
-    m_camera.SetProjection((16.0f / 9.0f), true);
+    m_camera.SetProjection((16.0f / 9.0f), 60.0f);
 
     p_vbo = std::make_shared<VertexBuffer>();
 
@@ -166,8 +166,8 @@ void SandboxLayer::OnImGuiRender()
     m_lightingShader.Use();
     ImGui::Text("Directional Light");
     if (ImGui::DragFloat3("Directional Rotation", (float*)(&dirDirection), 1.0f, -4960.0f, 4960.0f)) {
-        float yaw = glm::radians(dirDirection.x);
-        float pitch = glm::radians(dirDirection.y);
+        float yaw = glm::radians(dirDirection.y);
+        float pitch = glm::radians(dirDirection.x);
 
         glm::vec3 direction;
         direction.x = cos(pitch) * cos(yaw);
