@@ -8,8 +8,10 @@
 
 class OrthographicCameraController : public Layer {
 public:
-	OrthographicCameraController(float aspectRatio, bool rotation = false);
+	OrthographicCameraController();
 	~OrthographicCameraController();
+
+	void SetProjection(float aspectRatio, bool rotation = true);
 
 	inline const OrthographicCamera& GetCamera() const { return m_camera; }
 

@@ -10,12 +10,11 @@
 #include "gl/Skybox.h"
 #include "gl/Model.h"
 #include "gl/Texture.h"
+#include "gl/OrthographicCameraController.h"
 
 class SandboxLayer : public Layer
 {
 public:
-	SandboxLayer();
-
 	void OnAttach() override;
 	void OnEvent(Event& evnet) override;
 	void OnUpdate(float timestep) override;

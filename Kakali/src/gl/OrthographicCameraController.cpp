@@ -3,13 +3,18 @@
 #include "OrthographicCameraController.h"
 #include "core/Input.h"
 
-OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation)
-	:m_aspectRatio(aspectRatio), m_rotation(rotation), m_camera(-m_aspectRatio * m_zoom, m_aspectRatio* m_zoom, -m_zoom, m_zoom)
+OrthographicCameraController::OrthographicCameraController()
+	:m_aspectRatio(1.0f), m_rotation(true)
 {
 }
 
 OrthographicCameraController::~OrthographicCameraController()
 {
+}
+
+void OrthographicCameraController::SetProjection(float aspectRatio, bool rotation)
+{
+	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
 }
 
 void OrthographicCameraController::OnEvent(Event& event)
@@ -22,47 +27,41 @@ void OrthographicCameraController::OnEvent(Event& event)
 void OrthographicCameraController::OnUpdate(float timestep)
 {
 	glm::vec3 cameraPosition = m_camera.GetPosition();
-	float cameraRotation = m_camera.GetRotation();
+	glm::vec3 cameraRotation = m_camera.GetRotation(); // pitch (x), yaw (y), roll (z)
 
-	float cosRotation = cos(glm::radians(cameraRotation));
-	float sinRotation = sin(glm::radians(cameraRotation));
+	float yaw = glm::radians(cameraRotation.y);
+	float pitch = glm::radians(cameraRotation.x);
 
-	if (sinRotation == 0) {
-		// disregard rotation
-		cosRotation = 1;
-		sinRotation = 1;
-	}
-
-	if (Input::IsKeyPressed(GLFW_KEY_A))
-	{
-		cameraPosition.x -= cosRotation * m_cameraTranslationSpeed * timestep;
-	}
-	else if (Input::IsKeyPressed(GLFW_KEY_D))
-	{
-		cameraPosition.x += cosRotation * m_cameraTranslationSpeed * timestep;
-	}
+	glm::vec3 forward = glm::normalize(glm::vec3(
+		cos(pitch) * sin(yaw),
+		sin(pitch),
+		cos(pitch) * cos(yaw)
+	));
+	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f))); // world up
 
 	if (Input::IsKeyPressed(GLFW_KEY_W))
-	{
-		cameraPosition.y += m_cameraTranslationSpeed * timestep;
-	}
-	else if (Input::IsKeyPressed(GLFW_KEY_S))
-	{
-		cameraPosition.y -= m_cameraTranslationSpeed * timestep;
-	}
+		cameraPosition += forward * m_cameraTranslationSpeed * timestep;
+	if (Input::IsKeyPressed(GLFW_KEY_S))
+		cameraPosition -= forward * m_cameraTranslationSpeed * timestep;
+	if (Input::IsKeyPressed(GLFW_KEY_A))
+		cameraPosition -= right * m_cameraTranslationSpeed * timestep;
+	if (Input::IsKeyPressed(GLFW_KEY_D))
+		cameraPosition += right * m_cameraTranslationSpeed * timestep;
 
-	if (Input::IsKeyPressed(GLFW_KEY_Q)) {
-		cameraRotation += m_cameraRotationSpeed * timestep;
-		m_camera.SetRotation(cameraRotation);
-	}
-	if (Input::IsKeyPressed(GLFW_KEY_E)) {
-		cameraRotation -= m_cameraRotationSpeed * timestep;
-		m_camera.SetRotation(cameraRotation);
-	}
+	if (Input::IsKeyPressed(GLFW_KEY_Q))
+		cameraRotation.y += m_cameraRotationSpeed * timestep;
+	if (Input::IsKeyPressed(GLFW_KEY_E))
+		cameraRotation.y -= m_cameraRotationSpeed * timestep;
+
+	if (Input::IsKeyPressed(GLFW_KEY_R))
+		cameraRotation.x += m_cameraRotationSpeed * timestep;
+	if (Input::IsKeyPressed(GLFW_KEY_F))
+		cameraRotation.x -= m_cameraRotationSpeed * timestep;
 
 	m_camera.SetPosition(cameraPosition);
+	m_camera.SetRotation(cameraRotation);
 
-	m_cameraTranslationSpeed = 3 * m_zoom;
+	m_cameraTranslationSpeed = 3.0f * m_zoom;
 }
 
 void OrthographicCameraController::OnRender()

@@ -5,8 +5,8 @@
 
 class PerspectiveCamera {
 public:
-	PerspectiveCamera(float fov, float aspectRatio, float nearClip, float farClip);
-	~PerspectiveCamera();
+	PerspectiveCamera();
+	~PerspectiveCamera() = default;
 
 	void SetProjection(float fov, float aspectRatio, float nearClip, float farClip);
 

@@ -1,10 +1,5 @@
 #include "SandboxLayer.h"
 
-SandboxLayer::SandboxLayer()
-	:m_camera(16.0f / 9.0f, 60.0f)
-{
-}
-
 void SandboxLayer::OnAttach()
 {
     float skyboxVertices[] = {
@@ -54,6 +49,8 @@ void SandboxLayer::OnAttach()
 
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
     m_lightingShader.LoadShader("src/res/shaders/lighting.vert", "src/res/shaders/lighting.frag");
+
+    m_camera.SetProjection(16.0f / 9.0f, 60.0f);
 
     p_vbo = std::make_shared<VertexBuffer>();
 
@@ -154,7 +151,7 @@ void SandboxLayer::OnImGuiRender()
 {
     ImGui::Begin("Parameters");
     ImGui::Text("Global");
-    if (ImGui::DragFloat3("Global Ambient", (float*)(&globalAmbient), 0.05f, 0.0f, 1.0f)) {
+    if (ImGui::ColorEdit3("Global Ambient", (float*)(&globalAmbient))) {
         m_skyboxShader.Use();
         m_skyboxShader.SetFloat3("globalLight.ambient", globalAmbient.x, globalAmbient.y, globalAmbient.z);
         m_lightingShader.Use();
@@ -181,7 +178,7 @@ void SandboxLayer::OnImGuiRender()
 
         m_lightingShader.SetFloat3("directionalLight.direction", direction.x, direction.y, direction.z);
     }
-    if (ImGui::DragFloat3("Directional Ambient", (float*)(&dirAmbient), 0.05f, 0.0f, 1.0f)) {
+    if (ImGui::ColorEdit3("Directional Ambient", (float*)(&dirAmbient))) {
         m_lightingShader.SetFloat3("directionalLight.ambient", dirAmbient.x, dirAmbient.y, dirAmbient.z);
     }
     if (ImGui::DragFloat3("Directional Diffuse", (float*)(&dirDiffuse), 0.001f, 0.0f, 1.0f)) {

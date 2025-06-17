@@ -2,16 +2,12 @@
 
 #include "PerspectiveCamera.h"
 
-PerspectiveCamera::PerspectiveCamera(float fov, float aspectRatio, float nearClip, float farClip)
-	:m_fov(fov), m_aspectRatio(aspectRatio), m_nearClip(nearClip), m_farClip(farClip),
+PerspectiveCamera::PerspectiveCamera()
+	:m_fov(60.0f), m_aspectRatio(1.0f), m_nearClip(0.1f), m_farClip(100.0f),
 	m_position(0.0f), m_rotation(0.0f)
 {
 	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearClip, m_farClip);
 	RecalculateViewMatrix();
-}
-
-PerspectiveCamera::~PerspectiveCamera()
-{
 }
 
 void PerspectiveCamera::SetProjection(float fov, float aspectRatio, float nearClip, float farClip)
@@ -21,7 +17,7 @@ void PerspectiveCamera::SetProjection(float fov, float aspectRatio, float nearCl
 	m_nearClip = nearClip;
 	m_farClip = farClip;
 	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearClip, m_farClip);
-	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+	RecalculateViewMatrix();
 }
 
 void PerspectiveCamera::SetPosition(const glm::vec3& position)

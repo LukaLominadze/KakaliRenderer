@@ -4,14 +4,21 @@
 #include "core/Input.h"
 
 
-PerspectiveCameraController::PerspectiveCameraController(float aspectRatio, float fov)
-	: m_aspectRatio(aspectRatio), m_fov(fov), m_camera(m_fov, m_aspectRatio, 0.1f, 100.0f)
+PerspectiveCameraController::PerspectiveCameraController()
+	: m_aspectRatio(1.0f), m_fov(60.0f)
 {
 }
 
 PerspectiveCameraController::~PerspectiveCameraController()
 {
 	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void PerspectiveCameraController::SetProjection(float aspectRatio, float fov)
+{
+	m_aspectRatio = aspectRatio;
+	m_fov = fov;
+	m_camera.SetProjection(m_fov, m_aspectRatio, 0.1f, 100.0f);
 }
 
 void PerspectiveCameraController::OnEvent(Event& event)
