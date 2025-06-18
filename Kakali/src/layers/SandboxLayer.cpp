@@ -49,8 +49,15 @@ void SandboxLayer::OnAttach()
 
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
     m_lightingShader.LoadShader("src/res/shaders/lighting.vert", "src/res/shaders/lighting.frag");
+    m_shadowShader.LoadShader("src/res/shaders/shadow.vert", "src/res/shaders/shadow.frag");
+    m_shadowMap.GenBuffer({
+        1600, 900,
+        FrameBufferAttachments::DEPTH 
+        });
 
+    float aspect = 16.0f / 9.0f;
     m_camera.SetProjection((16.0f / 9.0f), 60.0f);
+    m_shadowOrtho.SetProjection(-aspect * 10.0f, aspect * 10.0f, -1.0f * 10.0f, 1.0f * 10.0f);
 
     p_vbo = std::make_shared<VertexBuffer>();
 
@@ -127,6 +134,7 @@ void SandboxLayer::OnUpdate(float timestep)
 
 void SandboxLayer::OnRender()
 {
+    GLCall(glDepthMask(GL_FALSE));
     m_skyboxShader.Use();
     glm::mat4 model(1.0f);
     model = glm::translate(model, m_camera.GetCamera().GetPosition());
@@ -135,11 +143,26 @@ void SandboxLayer::OnRender()
     m_skybox.Bind();
     m_skyboxShader.SetInt("skybox", 0);
     m_vao.Bind();
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+    GLCall(glDepthMask(GL_TRUE));
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    GLCall(glClear(GL_DEPTH_BUFFER_BIT));
+
+    m_shadowMap.Bind();
+    GLCall(glClear(GL_DEPTH_BUFFER_BIT));
+    glDepthMask(GL_TRUE);
+    m_shadowShader.Use();
+    m_shadowOrtho.SetPosition(m_camera.GetCamera().GetPosition() + glm::vec3(0, 0.0f, 0));
+    m_shadowOrtho.SetRotation(dirDirection);
+    m_shadowShader.SetMat4f("modelViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
+    m_floor.Draw(m_shadowShader);
+    m_backpack.Draw(m_shadowShader);
+    m_shadowMap.Unbind();
 
     m_lightingShader.Use();
+    GLCall(glActiveTexture(GL_TEXTURE8));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_shadowMap.GetDepthAttachment()));
+    m_lightingShader.SetInt("directionalLight.shadowMap", 8);
     m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix());
     glm::vec3 camPos = m_camera.GetCamera().GetPosition();
     m_lightingShader.SetFloat3("cameraPosition", camPos.x, camPos.y, camPos.z);

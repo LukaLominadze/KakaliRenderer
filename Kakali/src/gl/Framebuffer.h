@@ -2,12 +2,22 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-enum FrameBufferAttachments {
+enum class FrameBufferAttachments {
 	NONE = 0,
 	COLOR = 1 << 0,
 	DEPTH = 1 << 1,
 	DEPTH_STENCIL = 1 << 2,
 };
+
+inline FrameBufferAttachments operator|(FrameBufferAttachments a, FrameBufferAttachments b) {
+	return static_cast<FrameBufferAttachments>(
+		static_cast<int>(a) | static_cast<int>(b));
+}
+
+inline FrameBufferAttachments operator&(FrameBufferAttachments lhs, FrameBufferAttachments rhs) {
+	return static_cast<FrameBufferAttachments>(
+		static_cast<int>(lhs) & static_cast<int>(rhs));
+}
 
 struct FrameBufferSpecification {
 	uint32_t Width, Height;

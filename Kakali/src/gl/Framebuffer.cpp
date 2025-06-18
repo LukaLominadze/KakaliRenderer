@@ -10,6 +10,7 @@ FrameBuffer::FrameBuffer()
 
 void FrameBuffer::GenBuffer(const FrameBufferSpecification& props)
 {
+	m_spec = props;
 	GLCall(glCreateFramebuffers(1, &m_rendererID));
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID));
 

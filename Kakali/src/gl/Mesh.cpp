@@ -15,7 +15,7 @@ void Mesh::Draw(Shader& shader)
     unsigned int specularNr = 1;
     for (unsigned int i = 0; i < textures.size(); i++)
     {
-        glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
+        GLCall(glActiveTexture(GL_TEXTURE0 + i)); // activate proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
         std::string number;
         std::string name = textures[i].type;
@@ -25,41 +25,41 @@ void Mesh::Draw(Shader& shader)
             number = std::to_string(specularNr++);
 
         shader.SetInt(("material." + name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        GLCall(glBindTexture(GL_TEXTURE_2D, textures[i].id));
     }
-    glActiveTexture(GL_TEXTURE0);
+    GLCall(glActiveTexture(GL_TEXTURE0));
 
     // draw mesh
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    GLCall(glBindVertexArray(VAO));
+    GLCall(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0));
+    GLCall(glBindVertexArray(0));
 }
 
 void Mesh::setupMesh()
 {
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    GLCall(glGenVertexArrays(1, &VAO));
+    GLCall(glGenBuffers(1, &VBO));
+    GLCall(glGenBuffers(1, &EBO));
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    GLCall(glBindVertexArray(VAO));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    GLCall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW));
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-        &indices[0], GL_STATIC_DRAW);
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+        &indices[0], GL_STATIC_DRAW));
 
     // vertex positions
     // revisit this, the sizes are weird
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    GLCall(glEnableVertexAttribArray(0));
+    GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0));
     // vertex texture coords
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(float) * 3));
+    GLCall(glEnableVertexAttribArray(1));
+    GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(float) * 3)));
     // vertex normals
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(float) * 5));
+    GLCall(glEnableVertexAttribArray(2));
+    GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(float) * 5)));
 
-    glBindVertexArray(0);
+    GLCall(glBindVertexArray(0));
 }

@@ -20,6 +20,7 @@ struct DirectionalLight {
 	vec3 direction;
 	vec3 diffuse;
     vec3 specular;
+    sampler2D shadowMap;
 };
 
 uniform vec3 cameraPosition;

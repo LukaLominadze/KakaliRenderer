@@ -146,6 +146,8 @@ bool Window::StartGLAD()
 	GLCall(glDepthFunc(GL_LESS));
 	GLCall(glDepthMask(GL_TRUE));
 
+	SET_DEBUG_CALLBACK;
+
 	return true;
 }
 

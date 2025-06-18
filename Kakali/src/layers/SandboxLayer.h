@@ -11,6 +11,7 @@
 #include "gl/Model.h"
 #include "gl/Texture.h"
 #include "gl/OrthographicCameraController.h"
+#include "gl/Framebuffer.h"
 
 class SandboxLayer : public Layer
 {
@@ -23,13 +24,15 @@ public:
 	void OnDetach() override;
 private:
 	PerspectiveCameraController m_camera;
-	Shader m_skyboxShader, m_lightingShader;
+	OrthographicCamera m_shadowOrtho;
+	Shader m_skyboxShader, m_lightingShader, m_shadowShader;
 	VertexArray m_vao;
 	Skybox m_skybox;
 	std::shared_ptr<VertexBuffer> p_vbo;
 	Model m_backpack;
 	Mesh m_floor;
 	Texture m_floorTexture;
+	FrameBuffer m_shadowMap;
 
 	glm::vec3 globalAmbient = glm::vec3(1.0f);
 	float globalIntensity = 1.0f;
