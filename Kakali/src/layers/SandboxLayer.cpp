@@ -58,11 +58,32 @@ void SandboxLayer::OnAttach()
         1600, 900,
         FrameBufferAttachments::DEPTH
         });
+    m_pointShadowMap.GenBuffer({
+        1600, 900,
+        FrameBufferAttachments::DEPTH
+        });
+    m_pointShadowMap.Bind();
+    GLCall(glGenTextures(1, &m_pointCubemapID));
+    GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointCubemapID));
+
+    for (int i = 0; i < 6; i++) {
+        GLCall(glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0, GL_R32F, 900, 900, 0, GL_RED, GL_FLOAT, NULL));
+    }
+
+    GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
+    m_pointShadowMap.Unbind();
 
     float aspect = 16.0f / 9.0f;
     m_camera.SetProjection((16.0f / 9.0f), 60.0f);
     m_camera.GetCamera().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     m_spotCamera.SetProjection(spotOuterAngle * 2, aspect, 0.1f, 100.0f);
+    m_pointCamera.SetProjection(90.0f, aspect, 0.1f, 20.0f);
     m_shadowOrtho.SetProjection(-aspect * 10.0f, aspect * 10.0f, -1.0f * 10.0f, 1.0f * 10.0f, -30.0f, 30.0f);
 
     p_vbo = std::make_shared<VertexBuffer>();
@@ -204,6 +225,34 @@ void SandboxLayer::OnRender()
     m_backpack.Draw(m_shadowShader);
     m_dirShadowMap.Unbind();
 
+    glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+    for (int i = 0; i < 6; i++) {
+        m_pointShadowMap.Bind();
+        glViewport(0, 0, 900, 900);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_cameraDirections[i].ID, m_pointCubemapID, 0);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        float p = glm::degrees(asin(-m_cameraDirections[i].Direction.y));
+        float y = glm::degrees(atan2(m_cameraDirections[i].Direction.x, m_cameraDirections[i].Direction.z));
+        m_pointCamera.SetRotation(glm::vec3(p, y, 0.0f));
+        
+        m_shadowShader.Use();
+        m_shadowShader.SetFloat3("lightWorldPos", pointPosition.x, pointPosition.y, pointPosition.z);
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        m_shadowShader.SetMat4f("modelViewProjection", m_pointCamera.GetViewProjectionMatrix() * model);
+        m_shadowShader.SetMat4f("worldPos", model);
+        m_backpack.Draw(m_shadowShader);
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
+        m_shadowShader.SetMat4f("modelViewProjection", m_pointCamera.GetViewProjectionMatrix() * model);
+        m_shadowShader.SetMat4f("worldPos", model);
+        m_floor.Draw(m_shadowShader);
+    }
+    m_pointShadowMap.Unbind();
+    glViewport(0, 0, 1600, 900);
+    glClearColor(0.2f, 0.3f, 0.7f, 1.0f);
+
     m_spotShadowMap.Bind();
     GLCall(glClear(GL_DEPTH_BUFFER_BIT));
     glDepthMask(GL_TRUE);
@@ -222,12 +271,19 @@ void SandboxLayer::OnRender()
     GLCall(glActiveTexture(GL_TEXTURE7));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_spotShadowMap.GetDepthAttachment()));
     m_lightingShader.SetInt("spotLight_shadowMap", 7);
+    GLCall(glActiveTexture(GL_TEXTURE6));
+    GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointCubemapID));
+    m_lightingShader.SetInt("pointLight_shadowMap", 6);
     m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix());
     m_lightingShader.SetMat4f("dirShadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
     m_lightingShader.SetMat4f("spotShadowViewProjection", m_spotCamera.GetViewProjectionMatrix());
     glm::vec3 camPos = m_camera.GetCamera().GetPosition();
     m_lightingShader.SetFloat3("cameraPosition", camPos.x, camPos.y, camPos.z);
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    m_lightingShader.SetMat4f("worldPos", model);
     m_backpack.Draw(m_lightingShader);
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
+    m_lightingShader.SetMat4f("worldPos", model);
     m_floor.Draw(m_lightingShader);
 }
 

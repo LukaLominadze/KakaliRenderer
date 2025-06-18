@@ -13,6 +13,12 @@
 #include "gl/OrthographicCameraController.h"
 #include "gl/Framebuffer.h"
 
+struct CameraDirection {
+	uint32_t ID;
+	glm::vec3 Direction;
+	glm::vec3 Up;
+};
+
 class SandboxLayer : public Layer
 {
 public:
@@ -24,7 +30,7 @@ public:
 	void OnDetach() override;
 private:
 	PerspectiveCameraController m_camera;
-	PerspectiveCamera m_spotCamera;
+	PerspectiveCamera m_spotCamera, m_pointCamera;
 	OrthographicCamera m_shadowOrtho;
 	Shader m_skyboxShader, m_lightingShader, m_shadowShader;
 	VertexArray m_vao;
@@ -33,7 +39,7 @@ private:
 	Model m_backpack;
 	Mesh m_floor;
 	Texture m_floorTexture;
-	FrameBuffer m_dirShadowMap, m_spotShadowMap;
+	FrameBuffer m_dirShadowMap, m_spotShadowMap, m_pointShadowMap;
 
 	glm::vec3 globalAmbient = glm::vec3(0.5f, 0.5f, 0.8f);
 	float globalIntensity = 1.0f;
@@ -59,5 +65,17 @@ private:
 	glm::vec3 pointSpecular = glm::vec3(1.0f);
 	float pointIntensity = 0.9f;
 	float pointRadius = 4.0f;
+
+	uint32_t m_pointCubemapID;
+
+	CameraDirection m_cameraDirections[6] =
+	{
+		{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(0.0f, 1.0f, 0.0f) },
+		{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+		{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 0.0f, -1.0f) },
+		{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+		{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 1.0f, 0.0f) },
+		{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) }
+	};
 };
 

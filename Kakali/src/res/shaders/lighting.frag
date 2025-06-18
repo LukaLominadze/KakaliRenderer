@@ -5,6 +5,7 @@ in vec2 oTexCoord;
 in vec3 oNormal;
 in vec4 oDirShadowProjPos;
 in vec4 oSpotShadowProjPos;
+in vec3 oWorldPos;
 
 out vec4 FragColor;
 
@@ -52,6 +53,7 @@ uniform PointLight pointLight;
 
 uniform sampler2D directionalLight_shadowMap;
 uniform sampler2D spotLight_shadowMap;
+uniform samplerCube pointLight_shadowMap;
 
 float calculate_shadow_factor(sampler2D shadowMap, vec4 projpos) {
     vec3 projCoords = projpos.xyz / projpos.w;
@@ -77,6 +79,21 @@ float calculate_shadow_factor(sampler2D shadowMap, vec4 projpos) {
     }
 
     return shadow / 25.0;
+}
+
+float calculate_point_shadow_factor(vec3 lightToPixel) {
+    float dist = length(lightToPixel);
+
+    lightToPixel.y = -lightToPixel.y;
+
+    float sampledDist = texture(pointLight_shadowMap, lightToPixel).r;
+
+    float bias = 0.015;
+
+    if (sampledDist + bias < dist) {
+        return 0.15;
+    }
+    return 1.0;
 }
 
 vec3 directional_light()
@@ -127,6 +144,9 @@ vec3 spot_light() {
 
 vec3 point_light() {
     float d = distance(pointLight.position, oPos);
+    vec3 dist = oWorldPos - pointLight.position;
+
+    float shadowFactor = calculate_point_shadow_factor(dist);
     
     // Linear falloff up to radius
     float attenuation = clamp(1.0 - pow(d / pointLight.radius, 3.0), 0.0, 1.0);
@@ -148,7 +168,7 @@ vec3 point_light() {
     float spec = pow(max(dot(reflectDir, eyeDir), 0.0), 64.0);
     vec3 specular = pointLight.specular * spec * attenuation * pointLight.intensity;
 
-    return ambient + diffuse + specular;
+    return shadowFactor * (ambient + diffuse + specular);
 }
 
 
@@ -156,4 +176,5 @@ void main() {
 	vec4 ambient = vec4(globalLight.ambient * globalLight.intensity, 1.0);
     vec4 lights = vec4(directional_light() + spot_light() + point_light(), 1.0);
 	FragColor = ambient * lights;
+    //FragColor = vec4(oNormal * 0.5 + 0.5, 1.0);
 }
