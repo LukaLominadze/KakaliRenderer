@@ -50,14 +50,19 @@ void SandboxLayer::OnAttach()
     m_skyboxShader.LoadShader("src/res/shaders/skybox.vert", "src/res/shaders/skybox.frag");
     m_lightingShader.LoadShader("src/res/shaders/lighting.vert", "src/res/shaders/lighting.frag");
     m_shadowShader.LoadShader("src/res/shaders/shadow.vert", "src/res/shaders/shadow.frag");
-    m_shadowMap.GenBuffer({
+    m_dirShadowMap.GenBuffer({
         1600, 900,
         FrameBufferAttachments::DEPTH 
+        });
+    m_spotShadowMap.GenBuffer({
+        1600, 900,
+        FrameBufferAttachments::DEPTH
         });
 
     float aspect = 16.0f / 9.0f;
     m_camera.SetProjection((16.0f / 9.0f), 60.0f);
     m_camera.GetCamera().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    m_spotCamera.SetProjection(spotOuterAngle * 2, aspect, 0.1f, 100.0f);
     m_shadowOrtho.SetProjection(-aspect * 10.0f, aspect * 10.0f, -1.0f * 10.0f, 1.0f * 10.0f, -30.0f, 30.0f);
 
     p_vbo = std::make_shared<VertexBuffer>();
@@ -121,6 +126,14 @@ void SandboxLayer::OnAttach()
     m_lightingShader.SetFloat3("directionalLight.diffuse", dirDiffuse.x, dirDiffuse.y, dirDiffuse.z);
     m_lightingShader.SetFloat3("directionalLight.specular", dirSpecular.x, dirSpecular.y, dirSpecular.z);
     m_lightingShader.SetFloat("directionalLight.intensity", dirIntensity);
+    m_lightingShader.SetFloat3("spotLight.position", spotPosition.x, spotPosition.y, spotPosition.z);
+    m_lightingShader.SetFloat3("spotLight.ambient", spotAmbient.x, spotAmbient.y, spotAmbient.z);
+    m_lightingShader.SetFloat3("spotLight.diffuse", spotDiffuse.x, spotDiffuse.y, spotDiffuse.z);
+    m_lightingShader.SetFloat3("spotLight.specular", spotSpecular.x, spotSpecular.y, spotSpecular.z);
+    m_lightingShader.SetFloat("spotLight.intensity", spotIntensity);
+    m_lightingShader.SetFloat("spotLight.cutoffAngle", glm::cos(glm::radians(spotAngle)));
+    m_lightingShader.SetFloat("spotLight.outerAngle", glm::cos(glm::radians(spotOuterAngle)));
+
     float yaw = glm::radians(dirDirection.y);
     float pitch = glm::radians(dirDirection.x);
 
@@ -132,6 +145,17 @@ void SandboxLayer::OnAttach()
     direction = glm::normalize(direction);
 
     m_lightingShader.SetFloat3("directionalLight.direction", direction.x, direction.y, direction.z);
+
+    pitch = glm::radians(spotDirection.x);
+    yaw = glm::radians(spotDirection.y);
+
+    direction.x = cos(pitch) * cos(yaw);
+    direction.y = sin(pitch);
+    direction.z = cos(pitch) * sin(yaw);
+
+    direction = glm::normalize(direction);
+
+    m_lightingShader.SetFloat3("spotLight.direction", direction.x, direction.y, direction.z);
 }
 
 void SandboxLayer::OnEvent(Event& event)
@@ -160,7 +184,7 @@ void SandboxLayer::OnRender()
 
     GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
-    m_shadowMap.Bind();
+    m_dirShadowMap.Bind();
     GLCall(glClear(GL_DEPTH_BUFFER_BIT));
     glDepthMask(GL_TRUE);
     m_shadowShader.Use();
@@ -172,14 +196,29 @@ void SandboxLayer::OnRender()
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     m_shadowShader.SetMat4f("modelViewProjection", m_shadowOrtho.GetViewProjectionMatrix() * model);
     m_backpack.Draw(m_shadowShader);
-    m_shadowMap.Unbind();
+    m_dirShadowMap.Unbind();
+
+    m_spotShadowMap.Bind();
+    GLCall(glClear(GL_DEPTH_BUFFER_BIT));
+    glDepthMask(GL_TRUE);
+    m_shadowShader.Use();
+    m_spotCamera.SetRotation(glm::vec3(spotDirection.x - 180.0f, spotDirection.y, 0.0f));
+    m_spotCamera.SetPosition(spotPosition);
+    m_shadowShader.SetMat4f("modelViewProjection", m_spotCamera.GetViewProjectionMatrix());
+    m_floor.Draw(m_shadowShader);
+    m_backpack.Draw(m_shadowShader);
+    m_spotShadowMap.Unbind();
 
     m_lightingShader.Use();
     GLCall(glActiveTexture(GL_TEXTURE8));
-    GLCall(glBindTexture(GL_TEXTURE_2D, m_shadowMap.GetDepthAttachment()));
-    m_lightingShader.SetInt("shadowMap", 8);
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_dirShadowMap.GetDepthAttachment()));
+    m_lightingShader.SetInt("directionalLight_shadowMap", 8);
+    GLCall(glActiveTexture(GL_TEXTURE7));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_spotShadowMap.GetDepthAttachment()));
+    m_lightingShader.SetInt("spotLight_shadowMap", 7);
     m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix());
-    m_lightingShader.SetMat4f("shadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
+    m_lightingShader.SetMat4f("dirShadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
+    m_lightingShader.SetMat4f("spotShadowViewProjection", m_spotCamera.GetViewProjectionMatrix());
     glm::vec3 camPos = m_camera.GetCamera().GetPosition();
     m_lightingShader.SetFloat3("cameraPosition", camPos.x, camPos.y, camPos.z);
     m_backpack.Draw(m_lightingShader);
@@ -228,6 +267,42 @@ void SandboxLayer::OnImGuiRender()
     }
     if (ImGui::DragFloat("Directional Intensity", &dirIntensity, 0.001f, 0.0f, 5.0f)) {
         m_lightingShader.SetFloat("directionalLight.intensity", dirIntensity);
+    }
+    ImGui::Text("Spot Light");
+    if (ImGui::DragFloat3("SpotLight Position", (float*)(&spotPosition), 0.05f, -100.0f, 100.0f)) {
+        m_lightingShader.SetFloat3("spotLight.position", spotPosition.x, spotPosition.y, spotPosition.z);
+    }
+    if (ImGui::DragFloat3("SpotLight Rotation", (float*)(&spotDirection), 1.0f, -4960.0f, 4960.0f)) {
+        float pitch = glm::radians(spotDirection.x);
+        float yaw = glm::radians(spotDirection.y);
+
+        glm::vec3 direction;
+        direction.x = cos(pitch) * cos(yaw);
+        direction.y = sin(pitch);
+        direction.z = cos(pitch) * sin(yaw);
+
+        direction = glm::normalize(direction);
+
+        m_lightingShader.SetFloat3("spotLight.direction", direction.x, direction.y, direction.z);
+    }
+    if (ImGui::ColorEdit3("SpotLight Ambient", (float*)(&spotAmbient))) {
+        m_lightingShader.SetFloat3("spotLight.ambient", spotAmbient.x, spotAmbient.y, spotAmbient.z);
+    }
+    if (ImGui::DragFloat3("SpotLight Diffuse", (float*)(&spotDiffuse), 0.001f, 0.0f, 1.0f)) {
+        m_lightingShader.SetFloat3("spotLight.diffuse", spotDiffuse.x, spotDiffuse.y, spotDiffuse.z);
+    }
+    if (ImGui::DragFloat3("SpotLight Specular", (float*)(&spotSpecular), 0.001f, 0.0f, 1.0f)) {
+        m_lightingShader.SetFloat3("spotLight.specular", spotSpecular.x, spotSpecular.y, spotSpecular.z);
+    }
+    if (ImGui::DragFloat("SpotLight Intensity", &spotIntensity, 0.001f, 0.0f, 5.0f)) {
+        m_lightingShader.SetFloat("spotLight.intensity", spotIntensity);
+    }
+    if (ImGui::DragFloat("SpotLight Angle", &spotAngle, 1.0f, 0.0f, 180.0f)) {
+        m_lightingShader.SetFloat("spotLight.cutoffAngle", glm::cos(glm::radians(spotAngle)));
+    }
+    if (ImGui::DragFloat("SpotLight Outer Angle", &spotOuterAngle, 1.0f, 0.0f, 180.0f)) {
+        m_lightingShader.SetFloat("spotLight.outerAngle", glm::cos(glm::radians(spotOuterAngle)));
+        m_spotCamera.SetProjection(spotOuterAngle * 2, (16.0f / 9.0f), 0.1f, 100.0f);
     }
     ImGui::End();
 }

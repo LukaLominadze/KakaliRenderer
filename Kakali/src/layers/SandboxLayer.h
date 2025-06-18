@@ -24,6 +24,7 @@ public:
 	void OnDetach() override;
 private:
 	PerspectiveCameraController m_camera;
+	PerspectiveCamera m_spotCamera;
 	OrthographicCamera m_shadowOrtho;
 	Shader m_skyboxShader, m_lightingShader, m_shadowShader;
 	VertexArray m_vao;
@@ -32,7 +33,7 @@ private:
 	Model m_backpack;
 	Mesh m_floor;
 	Texture m_floorTexture;
-	FrameBuffer m_shadowMap;
+	FrameBuffer m_dirShadowMap, m_spotShadowMap;
 
 	glm::vec3 globalAmbient = glm::vec3(1.0f);
 	float globalIntensity = 1.0f;
@@ -41,6 +42,15 @@ private:
 	glm::vec3 dirDiffuse = glm::vec3(1.0f);
 	glm::vec3 dirSpecular = glm::vec3(1.0f);
 	glm::vec3 dirDirection = glm::vec3(-50.0f, 20.0f, 0.0f);
-	float dirIntensity = 1.0f;
+	float dirIntensity = 0.6f;
+
+	glm::vec3 spotPosition = glm::vec3(0.0f, 6.0f, 0.0f);
+	glm::vec3 spotAmbient = glm::vec3(0.0f, 0.6f, 1.0f);
+	glm::vec3 spotDiffuse = glm::vec3(1.0f);
+	glm::vec3 spotSpecular = glm::vec3(1.0f);
+	glm::vec3 spotDirection = glm::vec3(90.0f, 0.0f, 0.0f);
+	float spotIntensity = 0.6f;
+	float spotAngle = 20.0f;
+	float spotOuterAngle = 30.0f;
 };
 
