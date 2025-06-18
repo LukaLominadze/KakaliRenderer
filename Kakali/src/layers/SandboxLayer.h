@@ -35,21 +35,21 @@ private:
 	Texture m_floorTexture;
 	FrameBuffer m_dirShadowMap, m_spotShadowMap;
 
-	glm::vec3 globalAmbient = glm::vec3(1.0f);
+	glm::vec3 globalAmbient = glm::vec3(0.5f, 0.5f, 0.8f);
 	float globalIntensity = 1.0f;
 
-	glm::vec3 dirAmbient = glm::vec3(1.0f);
+	glm::vec3 dirAmbient = glm::vec3(0.0f, 1.0f, 1.0f);
 	glm::vec3 dirDiffuse = glm::vec3(1.0f);
 	glm::vec3 dirSpecular = glm::vec3(1.0f);
 	glm::vec3 dirDirection = glm::vec3(-50.0f, 20.0f, 0.0f);
-	float dirIntensity = 0.6f;
+	float dirIntensity = 0.66f;
 
-	glm::vec3 spotPosition = glm::vec3(0.0f, 6.0f, 0.0f);
-	glm::vec3 spotAmbient = glm::vec3(0.0f, 0.6f, 1.0f);
+	glm::vec3 spotPosition = glm::vec3(-1.55f, 6.0f, 0.0f);
+	glm::vec3 spotAmbient = glm::vec3(0.7f, 0.0f, 1.0f);
 	glm::vec3 spotDiffuse = glm::vec3(1.0f);
 	glm::vec3 spotSpecular = glm::vec3(1.0f);
-	glm::vec3 spotDirection = glm::vec3(90.0f, 0.0f, 0.0f);
-	float spotIntensity = 0.6f;
+	glm::vec3 spotDirection = glm::vec3(87.0f, 0.0f, 0.0f);
+	float spotIntensity = 0.66f;
 	float spotAngle = 20.0f;
 	float spotOuterAngle = 30.0f;
 };
