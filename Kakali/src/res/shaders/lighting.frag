@@ -84,7 +84,7 @@ float calculate_shadow_factor(sampler2D shadowMap, vec4 projpos) {
 float calculate_point_shadow_factor(vec3 lightToPixel) {
     float dist = length(lightToPixel);
 
-    lightToPixel.y = -lightToPixel.y;
+    //lightToPixel.y = -lightToPixel.y;
 
     float sampledDist = texture(pointLight_shadowMap, lightToPixel).r;
 

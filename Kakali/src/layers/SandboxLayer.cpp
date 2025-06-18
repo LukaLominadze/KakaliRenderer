@@ -234,18 +234,17 @@ void SandboxLayer::OnRender()
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        float p = glm::degrees(asin(-m_cameraDirections[i].Direction.y));
-        float y = glm::degrees(atan2(m_cameraDirections[i].Direction.x, m_cameraDirections[i].Direction.z));
-        m_pointCamera.SetRotation(glm::vec3(p, y, 0.0f));
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 20.0f);
+        glm::mat4 shadowView = glm::lookAt(pointPosition, pointPosition + m_cameraDirections[i].Direction, m_cameraDirections[i].Up);
         
         m_shadowShader.Use();
         m_shadowShader.SetFloat3("lightWorldPos", pointPosition.x, pointPosition.y, pointPosition.z);
         model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        m_shadowShader.SetMat4f("modelViewProjection", m_pointCamera.GetViewProjectionMatrix() * model);
+        m_shadowShader.SetMat4f("modelViewProjection", shadowProj * shadowView * model);
         m_shadowShader.SetMat4f("worldPos", model);
         m_backpack.Draw(m_shadowShader);
         model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
-        m_shadowShader.SetMat4f("modelViewProjection", m_pointCamera.GetViewProjectionMatrix() * model);
+        m_shadowShader.SetMat4f("modelViewProjection", shadowProj * shadowView * model);
         m_shadowShader.SetMat4f("worldPos", model);
         m_floor.Draw(m_shadowShader);
     }
