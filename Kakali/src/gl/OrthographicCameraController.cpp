@@ -4,7 +4,7 @@
 #include "core/Input.h"
 
 OrthographicCameraController::OrthographicCameraController()
-	:m_aspectRatio(1.0f), m_rotation(true)
+	:m_aspectRatio(1.0f), m_rotation(true), m_near(0.0f), m_far(0.0f)
 {
 }
 
@@ -12,10 +12,12 @@ OrthographicCameraController::~OrthographicCameraController()
 {
 }
 
-void OrthographicCameraController::SetProjection(float aspectRatio, bool rotation)
+void OrthographicCameraController::SetProjection(float aspectRatio, float near, float far, bool rotation)
 {
 	m_aspectRatio = aspectRatio;
-	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
+	m_near = near;
+	m_far = m_far;
+	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom, m_near, m_far);
 }
 
 void OrthographicCameraController::OnEvent(Event& event)
@@ -84,14 +86,14 @@ bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 {
 	m_zoom -= e.GetOffsetY() * 0.25f;
 	m_zoom = std::max(m_zoom, 0.25f);
-	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
+	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom, m_near, m_far);
 	return false;
 }
 
 bool OrthographicCameraController::OnWindowResized(WindowResizedEvent& e)
 {
 	m_aspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
-	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
+	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom, m_near, m_far);
 	return false;
 }
 

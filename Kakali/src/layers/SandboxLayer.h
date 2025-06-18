@@ -40,7 +40,7 @@ private:
 	glm::vec3 dirAmbient = glm::vec3(1.0f);
 	glm::vec3 dirDiffuse = glm::vec3(1.0f);
 	glm::vec3 dirSpecular = glm::vec3(1.0f);
-	glm::vec3 dirDirection = glm::vec3(0.0f);
+	glm::vec3 dirDirection = glm::vec3(-50.0f, 20.0f, 0.0f);
 	float dirIntensity = 1.0f;
 };
 

@@ -11,7 +11,7 @@ public:
 	OrthographicCameraController();
 	~OrthographicCameraController();
 
-	void SetProjection(float aspectRatio, bool rotation = true);
+	void SetProjection(float aspectRatio, float near, float far, bool rotation = true);
 
 	inline const OrthographicCamera& GetCamera() const { return m_camera; }
 
@@ -26,6 +26,7 @@ private:
 private:
 	float m_aspectRatio;
 	float m_zoom = 1.0f;
+	float m_near, m_far;
 	OrthographicCamera m_camera;
 
 	bool m_rotation = false;

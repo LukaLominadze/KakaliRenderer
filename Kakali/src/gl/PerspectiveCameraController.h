@@ -15,7 +15,7 @@ public:
 
 	void SetProjection(float aspectRatio, float fov = 60.0f);
 
-	inline const PerspectiveCamera& GetCamera() const { return m_camera; }
+	inline PerspectiveCamera& GetCamera() { return m_camera; }
 
 	void OnEvent(Event& event) override;
 	void OnUpdate(float timestep) override;

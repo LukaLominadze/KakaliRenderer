@@ -12,9 +12,9 @@ OrthographicCamera::OrthographicCamera()
 {
 }
 
-void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
+void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float near, float far)
 {
-	m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 100.0f);
+	m_projectionMatrix = glm::ortho(left, right, bottom, top, near, far);
 	m_viewProjectionMatrix = m_viewMatrix * m_projectionMatrix;
 
 	m_zoom = top;

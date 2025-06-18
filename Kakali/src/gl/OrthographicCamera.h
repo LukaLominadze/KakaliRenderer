@@ -8,7 +8,7 @@ public:
 	OrthographicCamera();
 	~OrthographicCamera() = default;
 
-	void SetProjection(float left, float right, float bottom, float top);
+	void SetProjection(float left, float right, float bottom, float top, float near, float far);
 	void SetMVPMatrix();
 
 	void SetPosition(const glm::vec3& position);
