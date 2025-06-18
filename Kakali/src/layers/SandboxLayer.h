@@ -52,5 +52,12 @@ private:
 	float spotIntensity = 0.66f;
 	float spotAngle = 20.0f;
 	float spotOuterAngle = 30.0f;
+
+	glm::vec3 pointPosition = glm::vec3(2.4f, -2.1f, 1.5f);
+	glm::vec3 pointAmbient = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 pointDiffuse = glm::vec3(1.0f);
+	glm::vec3 pointSpecular = glm::vec3(1.0f);
+	float pointIntensity = 0.9f;
+	float pointRadius = 4.0f;
 };
 

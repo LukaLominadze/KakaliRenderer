@@ -35,10 +35,20 @@ struct SpotLight {
     float outerAngle;
 };
 
+struct PointLight {
+    vec3 ambient;
+    float intensity;
+    vec3 position;
+    vec3 diffuse;
+    vec3 specular;
+    float radius;
+};
+
 uniform vec3 cameraPosition;
 uniform GlobalLight globalLight;
 uniform DirectionalLight directionalLight;
 uniform SpotLight spotLight;
+uniform PointLight pointLight;
 
 uniform sampler2D directionalLight_shadowMap;
 uniform sampler2D spotLight_shadowMap;
@@ -95,7 +105,7 @@ vec3 spot_light() {
         vec3 ambient = spotLight.ambient * spotLight.intensity;
 
         float brightness = max(dot(normalize(-spotLight.direction), oNormal), 0.0);
-        vec3 diffused = spotLight.ambient * brightness * spotLight.intensity;
+        vec3 diffused = spotLight.diffuse * brightness * spotLight.intensity;
 
         vec3 reflected = reflect(-normalize(spotLight.direction), oNormal);
         vec3 eyeVector = normalize(cameraPosition - oPos);
@@ -115,9 +125,35 @@ vec3 spot_light() {
     return vec3(0.0);
 }
 
+vec3 point_light() {
+    float d = distance(pointLight.position, oPos);
+    
+    // Linear falloff up to radius
+    float attenuation = clamp(1.0 - pow(d / pointLight.radius, 3.0), 0.0, 1.0);
+
+    // Lighting vectors
+    vec3 lightDir = normalize(pointLight.position - oPos);
+    vec3 normal = normalize(oNormal);
+    vec3 eyeDir = normalize(cameraPosition - oPos);
+
+    // Ambient
+    vec3 ambient = pointLight.ambient * attenuation * pointLight.intensity;
+
+    // Diffuse
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = pointLight.diffuse * diff * attenuation * pointLight.intensity;
+
+    // Specular
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(reflectDir, eyeDir), 0.0), 64.0);
+    vec3 specular = pointLight.specular * spec * attenuation * pointLight.intensity;
+
+    return ambient + diffuse + specular;
+}
+
 
 void main() {
 	vec4 ambient = vec4(globalLight.ambient * globalLight.intensity, 1.0);
-    vec4 lights = vec4(directional_light() + spot_light(), 1.0);
+    vec4 lights = vec4(directional_light() + spot_light() + point_light(), 1.0);
 	FragColor = ambient * lights;
 }

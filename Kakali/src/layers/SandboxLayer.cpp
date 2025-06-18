@@ -133,6 +133,12 @@ void SandboxLayer::OnAttach()
     m_lightingShader.SetFloat("spotLight.intensity", spotIntensity);
     m_lightingShader.SetFloat("spotLight.cutoffAngle", glm::cos(glm::radians(spotAngle)));
     m_lightingShader.SetFloat("spotLight.outerAngle", glm::cos(glm::radians(spotOuterAngle)));
+    m_lightingShader.SetFloat3("pointLight.position", pointPosition.x, pointPosition.y, pointPosition.z);
+    m_lightingShader.SetFloat3("pointLight.ambient", pointAmbient.x, pointAmbient.y, pointAmbient.z);
+    m_lightingShader.SetFloat3("pointLight.diffuse", pointDiffuse.x, pointDiffuse.y, pointDiffuse.z);
+    m_lightingShader.SetFloat3("pointLight.specular", pointSpecular.x, pointSpecular.y, pointSpecular.z);
+    m_lightingShader.SetFloat("pointLight.intensity", pointIntensity);
+    m_lightingShader.SetFloat("pointLight.radius", pointRadius);
 
     float yaw = glm::radians(dirDirection.y);
     float pitch = glm::radians(dirDirection.x);
@@ -303,6 +309,25 @@ void SandboxLayer::OnImGuiRender()
     if (ImGui::DragFloat("SpotLight Outer Angle", &spotOuterAngle, 1.0f, 0.0f, 180.0f)) {
         m_lightingShader.SetFloat("spotLight.outerAngle", glm::cos(glm::radians(spotOuterAngle)));
         m_spotCamera.SetProjection(spotOuterAngle * 2, (16.0f / 9.0f), 0.1f, 100.0f);
+    }
+    ImGui::Text("Point Light");
+    if (ImGui::DragFloat3("Point Position", (float*)(&pointPosition), 0.05f, -100.0f, 100.0f)) {
+        m_lightingShader.SetFloat3("pointLight.position", pointPosition.x, pointPosition.y, pointPosition.z);
+    }
+    if (ImGui::ColorEdit3("Point Ambient", (float*)(&pointAmbient))) {
+        m_lightingShader.SetFloat3("pointLight.ambient", pointAmbient.x, pointAmbient.y, pointAmbient.z);
+    }
+    if (ImGui::DragFloat3("Point Diffuse", (float*)(&pointDiffuse), 0.001f, 0.0f, 1.0f)) {
+        m_lightingShader.SetFloat3("pointLight.diffuse", pointDiffuse.x, pointDiffuse.y, pointDiffuse.z);
+    }
+    if (ImGui::DragFloat3("Point Specular", (float*)(&pointSpecular), 0.001f, 0.0f, 1.0f)) {
+        m_lightingShader.SetFloat3("pointLight.specular", pointSpecular.x, pointSpecular.y, pointSpecular.z);
+    }
+    if (ImGui::DragFloat("Point Intensity", &pointIntensity, 0.001f, 0.0f, 5.0f)) {
+        m_lightingShader.SetFloat("pointLight.intensity", pointIntensity);
+    }
+    if (ImGui::DragFloat("Point Radius", &pointRadius, 0.05f, 0.0f, 5.0f)) {
+        m_lightingShader.SetFloat("pointLight.radius", pointRadius);
     }
     ImGui::End();
 }
