@@ -3,6 +3,7 @@
 in vec3 oPos;
 in vec2 oTexCoord;
 in vec3 oNormal;
+in vec4 oShadowProjPos;
 
 out vec4 FragColor;
 
@@ -27,6 +28,20 @@ uniform vec3 cameraPosition;
 uniform GlobalLight globalLight;
 uniform DirectionalLight directionalLight;
 
+float calculate_shadow_factor(sampler2D shadowMap) {
+    vec3 projCoords = oShadowProjPos.xyz / oShadowProjPos.w;
+    vec2 UVCoords = vec2(0.5 * projCoords.x + 0.5, 0.5 * projCoords.y + 0.5);
+    float z = 0.5 * projCoords.z + 0.5;
+    float depth = texture(shadowMap, UVCoords).x;
+
+    float bias = 0.0025;
+
+    if (depth + bias < z) {
+        return 0.33;
+    }
+    return 1.0;
+}
+
 vec3 directional_light()
 {
     vec3 viewDir = normalize(cameraPosition - oPos);
@@ -41,7 +56,9 @@ vec3 directional_light()
     vec3 ambient  = directionalLight.ambient  * vec3(texture(texture_diffuse0, oTexCoord));
     vec3 diffuse  = directionalLight.diffuse  * diff * vec3(texture(texture_diffuse0, oTexCoord));
     vec3 specular = directionalLight.specular * spec * vec3(texture(texture_specular0, oTexCoord));
-    return (ambient + diffuse + specular) * directionalLight.intensity;
+
+    float shadowFactor = calculate_shadow_factor(directionalLight.shadowMap);
+    return shadowFactor * (ambient + diffuse + specular) * directionalLight.intensity;
 }
 
 

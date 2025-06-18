@@ -152,7 +152,7 @@ void SandboxLayer::OnRender()
     GLCall(glClear(GL_DEPTH_BUFFER_BIT));
     glDepthMask(GL_TRUE);
     m_shadowShader.Use();
-    m_shadowOrtho.SetPosition(m_camera.GetCamera().GetPosition() + glm::vec3(0, 0.0f, 0));
+    m_shadowOrtho.SetPosition(m_camera.GetCamera().GetPosition() + glm::vec3(0, 5.0f, 0));
     m_shadowOrtho.SetRotation(dirDirection);
     m_shadowShader.SetMat4f("modelViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
     m_floor.Draw(m_shadowShader);
@@ -164,6 +164,7 @@ void SandboxLayer::OnRender()
     GLCall(glBindTexture(GL_TEXTURE_2D, m_shadowMap.GetDepthAttachment()));
     m_lightingShader.SetInt("directionalLight.shadowMap", 8);
     m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix());
+    m_lightingShader.SetMat4f("shadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix());
     glm::vec3 camPos = m_camera.GetCamera().GetPosition();
     m_lightingShader.SetFloat3("cameraPosition", camPos.x, camPos.y, camPos.z);
     m_backpack.Draw(m_lightingShader);
