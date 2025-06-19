@@ -43,6 +43,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
     float radius;
+    float farPlane;
 };
 
 uniform vec3 cameraPosition;
@@ -54,6 +55,16 @@ uniform PointLight pointLight;
 uniform sampler2D directionalLight_shadowMap;
 uniform sampler2D spotLight_shadowMap;
 uniform samplerCube pointLight_shadowMap;
+
+// array of offset direction for sampling
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
 
 float calculate_shadow_factor(sampler2D shadowMap, vec4 projpos) {
     vec3 projCoords = projpos.xyz / projpos.w;
@@ -87,12 +98,21 @@ float calculate_point_shadow_factor(vec3 lightToPixel) {
     float sampledDist = texture(pointLight_shadowMap, lightToPixel).r;
 
     vec3 lightDir = normalize(lightToPixel);
-    float bias = max(0.01 * (1.0 - dot(oNormal, lightDir)), 0.005);
-
-    if (sampledDist + bias < dist) {
-        return 0.15;
+    
+    float bias = 0.15;
+    int samples = 20;
+    float shadow = samples;
+    float viewDistance = length(pointLight.position - oPos);
+    float diskRadius = (1.0 + (viewDistance / pointLight.farPlane)) / 100.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(pointLight_shadowMap, lightToPixel + gridSamplingDisk[i] * diskRadius).r;
+        if(closestDepth + bias < dist)
+            shadow -= 1.0;
     }
-    return 1.0;
+    shadow /= float(samples);
+
+    return shadow;
 }
 
 vec3 directional_light()

@@ -160,6 +160,7 @@ void SandboxLayer::OnAttach()
     m_lightingShader.SetFloat3("pointLight.specular", pointSpecular.x, pointSpecular.y, pointSpecular.z);
     m_lightingShader.SetFloat("pointLight.intensity", pointIntensity);
     m_lightingShader.SetFloat("pointLight.radius", pointRadius);
+    m_lightingShader.SetFloat("pointLight.farPlane", 20.0f);
 
     float yaw = glm::radians(dirDirection.y);
     float pitch = glm::radians(dirDirection.x);
