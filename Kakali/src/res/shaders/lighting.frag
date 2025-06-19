@@ -84,11 +84,10 @@ float calculate_shadow_factor(sampler2D shadowMap, vec4 projpos) {
 float calculate_point_shadow_factor(vec3 lightToPixel) {
     float dist = length(lightToPixel);
 
-    //lightToPixel.y = -lightToPixel.y;
-
     float sampledDist = texture(pointLight_shadowMap, lightToPixel).r;
 
-    float bias = 0.015;
+    vec3 lightDir = normalize(lightToPixel);
+    float bias = max(0.01 * (1.0 - dot(oNormal, lightDir)), 0.005);
 
     if (sampledDist + bias < dist) {
         return 0.15;
@@ -148,7 +147,7 @@ vec3 point_light() {
 
     float shadowFactor = calculate_point_shadow_factor(dist);
     
-    // Linear falloff up to radius
+    //TODO: better attenuation
     float attenuation = clamp(1.0 - pow(d / pointLight.radius, 3.0), 0.0, 1.0);
 
     // Lighting vectors
