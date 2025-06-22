@@ -26,7 +26,7 @@ private:
 	void OnRender();
 	void OnImGuiRender();
 private:
-	Window* p_window;
+	Window m_window;
 
 	LayerStack m_layerStack;
 	ImGuiLayer m_imGuiLayer;

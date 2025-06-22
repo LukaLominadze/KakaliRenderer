@@ -6,12 +6,11 @@
 
 bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
 {
-    p_window = new Window();
-    if (!p_window->StartUp(title, width, height, fullscreen, vsync)) {
+    if (!m_window.StartUp(title, width, height, fullscreen, vsync)) {
         std::cout << "Couldn't initialize window..." << std::endl;
         return false;
     }
-    p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+    m_window.SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
     if (!m_layerStack.StartUp()) {
         std::cout << "Couldn't initialize layer stack..." << std::endl;
@@ -24,8 +23,7 @@ bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bo
 
 void Application::ShutDown()
 {
-    p_window->ShutDown();
-    delete p_window;
+    m_window.ShutDown();
 }
 
 void Application::PushLayer(Layer* layer)
@@ -51,7 +49,7 @@ void Application::PopOverlay(Layer* layer)
 void Application::Run()
 {
     double lastTime = glfwGetTime();
-    while (!p_window->ShouldClose()) {
+    while (!m_window.ShouldClose()) {
         // delta time calculations
         double currentTime = glfwGetTime();
         double timestep = currentTime - lastTime;
@@ -61,8 +59,8 @@ void Application::Run()
         OnRender();
         OnImGuiRender();
 
-        p_window->PollEvents();
-        p_window->Update();
+        m_window.PollEvents();
+        m_window.Update();
     }
 }
 
@@ -70,7 +68,7 @@ void Application::OnEvent(Event& event)
 {
     if (event.GetEventType() == EventType::KeyPressed) {
         if (((KeyPressedEvent&)event).GetKeyCode() == GLFW_KEY_F11) {
-            p_window->SetFullscreen(!p_window->IsFullscreen());
+            m_window.SetFullscreen(!m_window.IsFullscreen());
         }
     }
     for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
