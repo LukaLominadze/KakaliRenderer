@@ -27,7 +27,6 @@ private:
 	void OnImGuiRender();
 private:
 	Window m_window;
-
 	LayerStack m_layerStack;
 	ImGuiLayer m_imGuiLayer;
 };

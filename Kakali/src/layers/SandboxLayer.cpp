@@ -52,7 +52,7 @@ void SandboxLayer::OnAttach()
     m_shadowShader.LoadShader("src/res/shaders/shadow.vert", "src/res/shaders/shadow.frag");
     m_dirShadowMap.GenBuffer({
         1600, 900,
-        FrameBufferAttachments::DEPTH 
+        FrameBufferAttachments::DEPTH
         });
     m_spotShadowMap.GenBuffer({
         1600, 900,

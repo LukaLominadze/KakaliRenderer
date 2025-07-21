@@ -45,7 +45,7 @@ void PerspectiveCamera::RecalculateViewMatrix()
 	m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 1.0f, 0.0f)));  // Cross product to get right vector
 	m_up = glm::normalize(glm::cross(m_right, m_front));
 
-	m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
+	m_viewMatrix = glm::lookAt(m_position, m_position + m_front, glm::vec3(0.0f, 1.0f, 0.0f));
 	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }
 

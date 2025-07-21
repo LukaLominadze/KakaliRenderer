@@ -27,7 +27,7 @@ public:
     std::vector<TextureData>      textures;
 
     Mesh() = default;
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureData> textures);
+    Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureData>& textures);
     void Draw(Shader& shader);
 private:
     //  render data
