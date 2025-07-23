@@ -19,7 +19,7 @@ void VertexBuffer::GenBuffer(const void* data, uint32_t size)
     GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
 }
 
-void VertexBuffer::Delete()
+void VertexBuffer::FreeBuffer()
 {
     if (m_rendererID == -1) {
         GLCall(glDeleteBuffers(1, &m_rendererID));

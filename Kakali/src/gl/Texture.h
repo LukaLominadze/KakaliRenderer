@@ -9,7 +9,7 @@ public:
 	~Texture() = default;
 
 	void GenTexture(const std::string& filePath);
-	void Delete();
+	void FreeTexture();
 
 	void Bind(uint32_t slot) const;
 	void Unbind() const;

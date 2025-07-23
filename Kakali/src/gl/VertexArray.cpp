@@ -8,7 +8,7 @@ void VertexArray::GenBuffer()
 	GLCall(glBindVertexArray(m_rendererID));
 }
 
-void VertexArray::Delete()
+void VertexArray::FreeArray()
 {
 	GLCall(glDeleteVertexArrays(1, &m_rendererID));
 }

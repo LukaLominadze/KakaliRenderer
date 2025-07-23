@@ -42,7 +42,7 @@ void Texture::GenTexture(const std::string& filePath)
 	}
 }
 
-void Texture::Delete()
+void Texture::FreeTexture()
 {
 	if (m_rendererID != -1) {
 		GLCall(glDeleteTextures(1, &m_rendererID));

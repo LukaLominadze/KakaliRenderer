@@ -13,7 +13,7 @@ public:
 	~VertexArray() = default;
 
 	void GenBuffer();
-	void Delete();
+	void FreeArray();
 
 	void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout);
 	void AddIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo);

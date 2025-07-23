@@ -9,7 +9,7 @@ public:
 	~VertexBuffer() = default;
 
 	void GenBuffer(const void* data, uint32_t size);
-	void Delete();
+	void FreeBuffer();
 
 	void SetData(const void* data, uint32_t size);
 

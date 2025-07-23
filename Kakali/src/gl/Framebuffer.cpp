@@ -53,7 +53,7 @@ void FrameBuffer::GenBuffer(const FrameBufferSpecification& props)
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void FrameBuffer::Delete()
+void FrameBuffer::FreeBuffer()
 {
 	if ((m_spec.Attachments & FrameBufferAttachments::COLOR) == FrameBufferAttachments::COLOR)
 		GLCall(glDeleteTextures(1, &m_colorAttachment));

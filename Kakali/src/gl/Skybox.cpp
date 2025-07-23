@@ -44,7 +44,7 @@ void Skybox::GenTexture(const std::string& filePath)
 	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 }
 
-void Skybox::Delete()
+void Skybox::FreeTexture()
 {
 	GLCall(glDeleteTextures(1, &m_rendererID));
 }

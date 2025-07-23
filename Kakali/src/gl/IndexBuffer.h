@@ -9,7 +9,7 @@ public:
 	~IndexBuffer() = default;
 
 	void GenBuffer(const void* data, uint32_t count);
-	void Delete();
+	void FreeBuffer();
 
 	void Bind() const;
 	void Unbind() const;

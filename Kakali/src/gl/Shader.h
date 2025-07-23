@@ -18,7 +18,7 @@ public:
     ~Shader() = default;
 
     void LoadShader(const char* vertexPath, const char* fragmentPath);
-    void Delete();
+    void FreeShader();
 
     void Use();
 

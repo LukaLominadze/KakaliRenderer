@@ -31,7 +31,7 @@ public:
 	~FrameBuffer() = default;
 
 	void GenBuffer(const FrameBufferSpecification& props);
-	void Delete();
+	void FreeBuffer();
 
 	void Resize(uint32_t width, uint32_t height);
 	void Invalidate();

@@ -12,7 +12,7 @@ public:
 	~Skybox() = default;
 
 	void GenTexture(const std::string& filePath);
-	void Delete();
+	void FreeTexture();
 
 	void Bind() const;
 	void Unbind() const;

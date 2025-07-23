@@ -28,6 +28,9 @@ public:
 
     Mesh() = default;
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureData>& textures);
+
+    void FreeMesh();
+
     void Draw(Shader& shader);
 private:
     //  render data

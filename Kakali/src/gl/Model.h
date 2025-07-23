@@ -10,10 +10,13 @@ class Model
 {
 public:
     Model() = default;
-    Model(const char* path)
+
+    inline void LoadModel(const char* path)
     {
         loadModel(path);
     }
+    void FreeModel();
+
     void Draw(Shader& shader);
 private:
     // model data

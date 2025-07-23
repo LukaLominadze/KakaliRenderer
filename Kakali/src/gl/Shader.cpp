@@ -78,7 +78,7 @@ void Shader::LoadShader(const char* vertexPath, const char* fragmentPath)
     GLCall(glDeleteShader(fragmentShader));
 }
 
-void Shader::Delete()
+void Shader::FreeShader()
 {
     GLCall(glDeleteProgram(m_rendererID));
 }

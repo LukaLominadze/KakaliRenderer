@@ -100,7 +100,7 @@ void SandboxLayer::OnAttach()
     m_skybox.GenTexture("src/res/skyboxes/ocean");
     m_skybox.Unbind();
 
-    m_backpack = Model("src/res/objects/backpack/backpack.obj");
+    m_backpack.LoadModel("src/res/objects/backpack/backpack.obj");
     std::vector<Vertex> vertices = {
         Vertex {
             glm::vec3(-8.0f, -5.0f, 8.0f),
@@ -390,8 +390,10 @@ void SandboxLayer::OnImGuiRender()
 
 void SandboxLayer::OnDetach()
 {
-    p_vbo->Delete();
-    m_vao.Delete();
-    m_skybox.Delete();
-    m_skyboxShader.Delete();
+    p_vbo->FreeBuffer();
+    m_vao.FreeArray();
+    m_skybox.FreeTexture();
+    m_skyboxShader.FreeShader();
+    m_backpack.FreeModel();
+    m_floor.FreeMesh();
 }

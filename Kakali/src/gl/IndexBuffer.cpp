@@ -28,7 +28,7 @@ void IndexBuffer::GenBuffer(const void* data, uint32_t count)
     GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(uint32_t), data, GL_DYNAMIC_DRAW));
 }
 
-void IndexBuffer::Delete()
+void IndexBuffer::FreeBuffer()
 {
     if (m_rendererID == -1) {
         GLCall(glDeleteBuffers(1, &m_rendererID));
