@@ -49,7 +49,8 @@ project "Kakali"
 	}
 
 	postbuildcommands {
-		"{COPYDIR} %{wks.location}/vendor/dependencies/assimp/assimp-vc143-mtd.dll %{wks.location}/bin/" ..outputdir.. "/%{prj.name}"
+		"{COPYDIR} %{wks.location}/vendor/dependencies/assimp/assimp-vc143-mtd.dll %{wks.location}/bin/" ..outputdir.. "/%{prj.name}",
+		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res"
 	}
 
 	filter "system:windows"
