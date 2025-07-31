@@ -24,7 +24,7 @@ public:
     // mesh data
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;
-    std::vector<TextureData>      textures;
+    std::vector<TextureData>  textures;
 
     Mesh() = default;
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<TextureData>& textures);

@@ -390,10 +390,26 @@ void SandboxLayer::OnImGuiRender()
 
 void SandboxLayer::OnDetach()
 {
+    // Floor
     p_vbo->FreeBuffer();
     m_vao.FreeArray();
-    m_skybox.FreeTexture();
-    m_skyboxShader.FreeShader();
-    m_backpack.FreeModel();
     m_floor.FreeMesh();
+    m_floorTexture.FreeTexture();
+
+    // Skybox
+    m_skybox.FreeTexture();
+
+    // Model
+    m_backpack.FreeModel();
+
+    // Framebuffers
+    m_dirShadowMap.FreeBuffer();
+    m_pointShadowMap.FreeBuffer();
+    GLCall(glDeleteTextures(1, &m_pointCubemapID));
+    m_spotShadowMap.FreeBuffer();
+
+    // Shaders
+    m_skyboxShader.FreeShader();
+    m_shadowShader.FreeShader();
+    m_lightingShader.FreeShader();
 }

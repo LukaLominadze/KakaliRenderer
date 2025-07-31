@@ -13,7 +13,10 @@ void Mesh::FreeMesh()
 {
     GLCall(glDeleteBuffers(1, &EBO));
     GLCall(glDeleteBuffers(1, &VBO));
-    GLCall(glDeleteBuffers(1, &VAO));
+    GLCall(glDeleteVertexArrays(1, &VAO));
+    vertices.clear();
+    indices.clear();
+    textures.clear();
 }
 
 void Mesh::Draw(Shader& shader)

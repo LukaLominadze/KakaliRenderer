@@ -21,7 +21,7 @@ void VertexBuffer::GenBuffer(const void* data, uint32_t size)
 
 void VertexBuffer::FreeBuffer()
 {
-    if (m_rendererID == -1) {
+    if (m_rendererID != -1) {
         GLCall(glDeleteBuffers(1, &m_rendererID));
         m_rendererID = -1;
     }

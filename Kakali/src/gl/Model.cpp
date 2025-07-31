@@ -4,9 +4,14 @@
 
 void Model::FreeModel()
 {
-    for (Mesh mesh : meshes) {
+    for (Mesh& mesh : meshes) {
         mesh.FreeMesh();
     }
+    for (TextureData& texture : textures_loaded) {
+        GLCall(glDeleteTextures(1, &texture.id));
+    }
+    meshes.clear();
+    textures_loaded.clear();
 }
 
 void Model::Draw(Shader& shader)
