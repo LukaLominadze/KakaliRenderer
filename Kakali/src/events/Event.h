@@ -9,15 +9,11 @@ enum class EventType {
 
 class Event {
 public:
-	Event(EventType type)
-		:m_type(type)
-	{}
-
 	bool Handled = false;
 
 	inline EventType GetEventType() const { return m_type; }
 
-private:
+protected:
 	EventType m_type;
 };
 

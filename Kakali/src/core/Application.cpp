@@ -10,7 +10,8 @@ bool Application::StartUp(const char* title, uint32_t width, uint32_t height, bo
         std::cout << "Couldn't initialize window..." << std::endl;
         return false;
     }
-    m_window.SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+    p_eventBufferPointer = (Event*)& m_eventBuffer;
+    m_window.SetEventQueueCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
 
     if (!m_layerStack.StartUp()) {
         std::cout << "Couldn't initialize layer stack..." << std::endl;
@@ -55,6 +56,7 @@ void Application::Run()
         double timestep = currentTime - lastTime;
         lastTime = currentTime;
 
+        OnEvent();
         OnUpdate(timestep);
         OnRender();
         OnImGuiRender();
@@ -64,19 +66,34 @@ void Application::Run()
     }
 }
 
-void Application::OnEvent(Event& event)
+void Application::QueueEvent(std::function<void(Event*)>&& func)
 {
-    if (event.GetEventType() == EventType::KeyPressed) {
-        if (((KeyPressedEvent&)event).GetKeyCode() == GLFW_KEY_F11) {
-            m_window.SetFullscreen(!m_window.IsFullscreen());
+    m_eventQueue.push(func);
+}
+
+void Application::OnEvent()
+{
+    while (m_eventQueue.size() > 0) {
+        std::function<void(Event*)>& func = m_eventQueue.front();
+        func(p_eventBufferPointer);
+
+        Event& event = *p_eventBufferPointer;
+
+        if (event.GetEventType() == EventType::KeyPressed) {
+            if (((KeyPressedEvent&)event).GetKeyCode() == GLFW_KEY_F11) {
+                m_window.SetFullscreen(!m_window.IsFullscreen());
+            }
         }
+        for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
+        {
+            (*--it)->OnEvent(event);
+            if (event.Handled)
+                break;
+        }
+
+        m_eventQueue.pop();
     }
-    for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
-    {
-        (*--it)->OnEvent(event);
-        if (event.Handled)
-            break;
-    }
+
 }
 
 void Application::OnUpdate(double timestep)

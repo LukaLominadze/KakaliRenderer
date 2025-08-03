@@ -169,8 +169,10 @@ void Window::CreateCallbacks()
 				data.WindowedHeight = height;
 			}
 			glViewport(0, 0, data.Width, data.Height);
-			WindowResizedEvent event(width, height);
-			data.EventCallback(event);
+
+			data.EventQueueCallback([width, height](Event* ref) {
+				((WindowResizedEvent*)(ref))->Initialize(width, height);
+				});
 		});
 
 	glfwSetKeyCallback(p_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -181,20 +183,23 @@ void Window::CreateCallbacks()
 			{
 			case GLFW_PRESS:
 			{
-				KeyPressedEvent event(key);
-				data.EventCallback(event);
+				data.EventQueueCallback([key](Event* ref) {
+					((KeyPressedEvent*)(ref))->Initialize(key);
+					});
 				break;
 			}
 			case GLFW_RELEASE:
 			{
-				KeyReleasedEvent event(key);
-				data.EventCallback(event);
+				data.EventQueueCallback([key](Event* ref) {
+					((KeyReleasedEvent*)(ref))->Initialize(key);
+					});
 				break;
 			}
 			case GLFW_REPEAT:
 			{
-				KeyPressedEvent event(key);
-				data.EventCallback(event);
+				data.EventQueueCallback([key](Event* ref) {
+					((KeyPressedEvent*)(ref))->Initialize(key);
+					});
 				break;
 			}
 			}
@@ -208,14 +213,16 @@ void Window::CreateCallbacks()
 			{
 			case GLFW_PRESS:
 			{
-				MouseButtonPressedEvent event(button);
-				data.EventCallback(event);
+				data.EventQueueCallback([button](Event* ref) {
+					((MouseButtonPressedEvent*)(ref))->Initialize(button);
+					});
 				break;
 			}
 			case GLFW_RELEASE:
 			{
-				MouseButtonReleasedEvent event(button);
-				data.EventCallback(event);
+				data.EventQueueCallback([button](Event* ref) {
+					((MouseButtonReleasedEvent*)(ref))->Initialize(button);
+					});
 				break;
 			}
 			}
@@ -225,7 +232,8 @@ void Window::CreateCallbacks()
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			MouseScrolledEvent event((float)xOffset, (float)yOffset);
-			data.EventCallback(event);
+			data.EventQueueCallback([xOffset, yOffset](Event* ref) {
+				((MouseScrolledEvent*)(ref))->Initialize((float)xOffset, (float)yOffset);
+				});
 		});
 }

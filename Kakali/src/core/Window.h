@@ -12,7 +12,7 @@ struct WindowData {
 	bool Fullscreen, VSync;
 	bool ShouldClose;
 
-	std::function<void(Event&)> EventCallback;
+	std::function<void(std::function<void(Event*)>&&)> EventQueueCallback;
 };
 
 class Window
@@ -24,8 +24,8 @@ public:
 	bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
 	void ShutDown();
 
-	inline void SetEventCallback(const std::function<void(Event&)>& callback) {
-		m_windowData.EventCallback = callback;
+	inline void SetEventQueueCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
+		m_windowData.EventQueueCallback = callback;
 	}
 
 	void PollEvents();
