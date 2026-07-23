@@ -135,7 +135,7 @@ vec3 directional_light()
 }
 
 vec3 spot_light() {
-    vec3 lightDir = normalize(oPos - spotLight.position);
+    vec3 lightDir = normalize(oWorldPos - spotLight.position);
     float theta = dot(lightDir, normalize(-spotLight.direction)); 
     if (theta > spotLight.outerAngle) {
         vec3 ambient = spotLight.ambient * spotLight.intensity;
@@ -162,7 +162,7 @@ vec3 spot_light() {
 }
 
 vec3 point_light() {
-    float d = distance(pointLight.position, oPos);
+    float d = distance(pointLight.position, oWorldPos);
     vec3 dist = oWorldPos - pointLight.position;
 
     float shadowFactor = calculate_point_shadow_factor(dist);

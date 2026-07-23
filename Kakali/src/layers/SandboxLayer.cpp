@@ -103,22 +103,22 @@ void SandboxLayer::OnAttach()
     m_backpack.LoadModel("src/res/objects/backpack/backpack.obj");
     std::vector<Vertex> vertices = {
         Vertex {
-            glm::vec3(-8.0f, -5.0f, 8.0f),
+            glm::vec3(-8.0f, 0.0f, 8.0f),
             glm::vec2(0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         },
         Vertex {
-            glm::vec3(-8.0f, -5.0f, -8.0f),
+            glm::vec3(-8.0f, 0.0f, -8.0f),
             glm::vec2(0.0f, 1.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         },
         Vertex {
-            glm::vec3(8.0f, -5.0f, -8.0f),
+            glm::vec3(8.0f, 0.0f, -8.0f),
             glm::vec2(1.0f, 1.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         },
         Vertex {
-            glm::vec3(8.0f, -5.0f, 8.0f),
+            glm::vec3(8.0f, 0.0f, 8.0f),
             glm::vec2(1.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         },
@@ -221,7 +221,7 @@ void SandboxLayer::OnRender()
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
     m_shadowShader.SetMat4f("modelViewProjection", m_shadowOrtho.GetViewProjectionMatrix() * model);
     m_floor.Draw(m_shadowShader);
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
     m_shadowShader.SetMat4f("modelViewProjection", m_shadowOrtho.GetViewProjectionMatrix() * model);
     m_backpack.Draw(m_shadowShader);
     m_dirShadowMap.Unbind();
@@ -240,7 +240,7 @@ void SandboxLayer::OnRender()
         
         m_shadowShader.Use();
         m_shadowShader.SetFloat3("lightWorldPos", pointPosition.x, pointPosition.y, pointPosition.z);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
         m_shadowShader.SetMat4f("modelViewProjection", shadowProj * shadowView * model);
         m_shadowShader.SetMat4f("worldPos", model);
         m_backpack.Draw(m_shadowShader);
@@ -259,8 +259,11 @@ void SandboxLayer::OnRender()
     m_shadowShader.Use();
     m_spotCamera.SetRotation(glm::vec3(spotDirection.x - 180.0f, spotDirection.y, 0.0f));
     m_spotCamera.SetPosition(spotPosition);
-    m_shadowShader.SetMat4f("modelViewProjection", m_spotCamera.GetViewProjectionMatrix());
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
+    m_shadowShader.SetMat4f("modelViewProjection", m_spotCamera.GetViewProjectionMatrix() * model);
     m_floor.Draw(m_shadowShader);
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
+    m_shadowShader.SetMat4f("modelViewProjection", m_spotCamera.GetViewProjectionMatrix() * model);
     m_backpack.Draw(m_shadowShader);
     m_spotShadowMap.Unbind();
 
@@ -279,11 +282,17 @@ void SandboxLayer::OnRender()
     m_lightingShader.SetMat4f("spotShadowViewProjection", m_spotCamera.GetViewProjectionMatrix());
     glm::vec3 camPos = m_camera.GetCamera().GetPosition();
     m_lightingShader.SetFloat3("cameraPosition", camPos.x, camPos.y, camPos.z);
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f));
     m_lightingShader.SetMat4f("worldPos", model);
+    m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix() * model);
+    m_lightingShader.SetMat4f("dirShadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix() * model);
+    m_lightingShader.SetMat4f("spotShadowViewProjection", m_spotCamera.GetViewProjectionMatrix() * model);
     m_backpack.Draw(m_lightingShader);
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
     m_lightingShader.SetMat4f("worldPos", model);
+    m_lightingShader.SetMat4f("modelViewProjection", m_camera.GetCamera().GetViewProjectionMatrix() * model);
+    m_lightingShader.SetMat4f("dirShadowViewProjection", m_shadowOrtho.GetViewProjectionMatrix() * model);
+    m_lightingShader.SetMat4f("spotShadowViewProjection", m_spotCamera.GetViewProjectionMatrix() * model);
     m_floor.Draw(m_lightingShader);
 }
 

@@ -15,7 +15,7 @@ PerspectiveCameraController::~PerspectiveCameraController()
 }
 
 void PerspectiveCameraController::SetProjection(float aspectRatio, float fov)
-{
+{\
 	m_aspectRatio = aspectRatio;
 	m_fov = fov;
 	m_camera.SetProjection(m_fov, m_aspectRatio, 0.1f, 100.0f);

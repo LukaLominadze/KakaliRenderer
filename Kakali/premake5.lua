@@ -12,12 +12,13 @@ project "Kakali"
 	
 	files {
 		"src/**.h",
+		"src/**.hpp",
 		"src/**.cpp"
 	}
 
 	vpaths {
 		["Source Files"] = "src/**.cpp",
-		["Header Files"] = "src/**.h"
+		["Header Files"] = { "src/**.h", "src/**.hpp" }
 	}
 
 	includedirs {  "src",
